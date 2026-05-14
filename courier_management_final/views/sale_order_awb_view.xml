@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_form_awb" model="ir.ui.view">
+        <field name="name">sale.order.form.awb.fields</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Insert AWB + Barcode into Sale Order Form -->
+            <xpath expr="//sheet//group" position="inside">
+                <field name="hide_ecommerce_info" invisible="1"/>
+                <group string="Ecommerce Information" invisible="hide_ecommerce_info">
+                    <field name="awb_number" readonly="1"/>
+                    <field name="barcode_number" readonly="1"/>
+                    <field name="serviced_by_id" widget="many2one"/>
+                </group>
+            </xpath>
+
+            <!--            <xpath expr="//sheet//group" position="inside">-->
+            <!--                &lt;!&ndash; conditional group: hidden when request_id is present &ndash;&gt;-->
+            <!--                <group string="Ecommerce Information" invisible="request_id">-->
+            <!--                    <field name="awb_number" readonly="1"/>-->
+            <!--                    <field name="barcode_number" readonly="1"/>-->
+            <!--                    <field name="serviced_by_id" widget="many2one"/>-->
+            <!--                </group>-->
+            <!--            </xpath>-->
+
+
+            <!-- Add domain attribute on order_line so hidden courier lines are not visible -->
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="domain">[('is_courier_hidden','=',False)]</attribute>
+            </xpath>
+
+        </field>
+    </record>
+    <!-- Inherit sale order form to add smart button -->
+    <record id="view_order_form_inherit_purchase_button" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.purchase.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- place the button in the form header so it appears as a smart button -->
+            <header>
+                <button name="action_view_purchase_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        invisible="purchase_order_count == 0"
+                >
+                    <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                </button>
+            </header>
+        </field>
+    </record>
+
+
+    <record id="sale_order_hide_toolbar_purchase_button_exact" model="ir.ui.view">
+        <field name="name">sale.order.hide.toolbar.purchase.button.exact</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!--
+              Single robust XPath:
+              - find any <button> with name action_view_purchase_orders (typical)
+              OR
+              - find <a> inside the toolbar that contains text 'Purchase Orders' (theme fallback)
+            -->
+            <xpath expr="//button[@name='action_view_purchase_orders'] | //div[contains(@class,'oe_button_box') or @name='button_box']//a[contains(., 'Purchase Orders') or @name='action_view_purchase_orders']"
+                   position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>
+
+
+        <!--<odoo>-->
+        <!--    <record id="view_sale_order_form_awb" model="ir.ui.view">-->
+        <!--        <field name="name">sale.order.form.awb.fields</field>-->
+        <!--        <field name="model">sale.order</field>-->
+        <!--        <field name="inherit_id" ref="sale.view_order_form"/>-->
+        <!--        <field name="arch" type="xml">-->
+
+        <!--            &lt;!&ndash; Insert AWB + Barcode into Sale Order Form &ndash;&gt;-->
+        <!--            <xpath expr="//sheet//group" position="inside">-->
+        <!--                <group string="Courier Information">-->
+        <!--                    <field name="awb_number" readonly="1"/>-->
+        <!--                    <field name="barcode_number" readonly="1"/>-->
+        <!--                </group>-->
+        <!--            </xpath>-->
+        <!--            &lt;!&ndash; Add domain attribute on order_line so hidden courier lines are not visible &ndash;&gt;-->
+        <!--            <xpath expr="//field[@name='order_line']" position="attributes">-->
+        <!--                <attribute name="domain">[('is_courier_hidden','=',False)]</attribute>-->
+        <!--            </xpath>-->
+
+        <!--        </field>-->
+        <!--    </record>-->
+        <!--    &lt;!&ndash; Inherit sale order form to add smart button &ndash;&gt;-->
+        <!--    <record id="view_order_form_inherit_purchase_button" model="ir.ui.view">-->
+        <!--        <field name="name">sale.order.form.inherit.purchase.button</field>-->
+        <!--        <field name="model">sale.order</field>-->
+        <!--        <field name="inherit_id" ref="sale.view_order_form"/>-->
+        <!--        <field name="arch" type="xml">-->
+
+
+        <!--            &lt;!&ndash; place the button in the form header so it appears as a smart button &ndash;&gt;-->
+        <!--            <header>-->
+        <!--                <button name="action_view_purchase_orders"-->
+        <!--                        type="object"-->
+        <!--                        class="oe_stat_button"-->
+        <!--                        invisible="purchase_order_count == 0"-->
+        <!--                        >-->
+        <!--                    <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>-->
+        <!--                </button>-->
+        <!--            </header>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+
+        <!--</odoo>-->

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_courier_handoff" model="ir.actions.report">
+        <field name="name">Courier Handoff PDF</field>
+        <field name="model">courier.handoff</field>
+        <field name="report_type">qweb-pdf</field>
+
+        <field name="report_name">courier_management_final.report_courier_handoff</field>
+        <field name="report_file">courier_management_final.report_courier_handoff</field>
+
+        <field name="binding_model_id" ref="model_courier_handoff"/>
+    </record>
+</odoo>

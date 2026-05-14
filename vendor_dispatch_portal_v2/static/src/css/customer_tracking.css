@@ -1,0 +1,65 @@
+@charset "UTF-8";
+
+/* ===============================
+   VERTICAL CUSTOMER TRACKING
+================================ */
+
+.o_customer_tracking_box {
+    max-width: 420px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.o_tracking_vertical {
+    position: relative;
+    margin-left: 20px;
+}
+
+.o_tracking_step {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 30px;
+}
+
+.o_tracking_step::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 22px;
+    width: 2px;
+    height: 100%;
+    background: #ddd;
+}
+
+.o_tracking_step:last-child::before {
+    display: none;
+}
+
+.o_tracking_circle {
+    position: absolute;
+    left: -2px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ccc;
+}
+
+.o_tracking_label {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ACTIVE STATES */
+
+.o_tracking_step.active .o_tracking_circle {
+    background: #0d6efd;
+}
+
+.o_tracking_step.active .o_tracking_label {
+    font-weight: 600;
+    color: #0d6efd;
+}

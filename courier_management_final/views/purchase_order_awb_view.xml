@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_awb" model="ir.ui.view">
+        <field name="name">purchase.order.form.awb.info</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+<!--            <xpath expr="//sheet//group" position="inside">-->
+<!--                <group string="Courier Information">-->
+<!--                    <field name="awb_number" readonly="1"/>-->
+<!--                    <field name="barcode_number" readonly="1"/>-->
+<!--                </group>-->
+<!--            </xpath>-->
+             <xpath expr="//field[@name='order_line']//list" position="inside">
+                <!-- place AWB before the subtotal column -->
+                <field name="awb_number" string="AWB" readonly="1"/>
+                <!-- optional: show barcode as column too -->
+                <field name="barcode_number" string="Barcode" readonly="1"/>
+            </xpath>
+
+
+            <xpath expr="//form/header" position="inside">
+                <button name="action_view_sale_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        invisible="sale_order_count == 0">
+                    <field name="sale_order_count" widget="statinfo" string="Sale Orders"/>
+                </button>
+            </xpath>
+
+
+
+
+
+        </field>
+    </record>
+</odoo>

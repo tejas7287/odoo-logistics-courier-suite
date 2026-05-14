@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========== Actions ========== -->
+    <record id="action_fincode" model="ir.actions.act_window">
+        <field name="name">ZipCode Master</field>
+        <field name="res_model">codeware.fincode</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_transit_hub" model="ir.actions.act_window">
+        <field name="name">Transit Hubs</field>
+        <field name="res_model">codeware.transithub</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <record id="action_request" model="ir.actions.act_window">
+        <field name="name">Requests</field>
+        <field name="res_model">codeware.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_request_order" model="ir.actions.act_window">
+        <field name="name">Request Orders</field>
+        <field name="res_model">codeware.request.order</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <record id="action_priority_pricelist" model="ir.actions.act_window">
+        <field name="name">Priority Pricelist</field>
+        <field name="res_model">codeware.priority.pricelist</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_distance_pricelist" model="ir.actions.act_window">
+        <field name="name">Distance Pricelist</field>
+        <field name="res_model">codeware.distance.pricelist</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_weight_pricelist" model="ir.actions.act_window">
+        <field name="name">Weight Pricelist</field>
+        <field name="res_model">codeware.weight.pricelist</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_courier_companies" model="ir.actions.act_window">
+        <field name="name">Courier Companies</field>
+        <field name="res_model">codeware.courier.company</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- MAIN ROOT -->
+    <menuitem id="menu_codeware_root" name="Courier Management" sequence="1"/>
+
+    <!-- Setup (order 1) -->
+    <menuitem id="menu_codeware_setup" name="Setup" parent="menu_codeware_root" sequence="1"/>
+    <menuitem id="menu_codeware_fincode" name="ZipCode Master" parent="menu_codeware_setup" action="action_fincode"
+              sequence="1"/>
+    <menuitem id="menu_codeware_hubs" name="Transit Hubs" parent="menu_codeware_setup" action="action_transit_hub"
+              sequence="2"/>
+
+    <menuitem id="menu_codeware_courier_companies" name="Courier Companies"
+              parent="menu_codeware_root" action="action_courier_companies" sequence="1" groups="base.group_user"/>
+
+
+    <!-- Pricing Header (order 2) -->
+    <!-- add groups="base.group_user" only if you want all internal users to see this menu;
+         remove groups attribute to rely purely on ACLs -->
+    <menuitem id="menu_pricing_rules_root" name="Pricing Rules" parent="menu_codeware_root" sequence="2"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_priority_pricelist" name="Priority Pricelist"
+              parent="menu_pricing_rules_root"
+              action="action_priority_pricelist" sequence="1"/>
+
+    <menuitem id="menu_distance_pricelist" name="Distance Pricelist"
+              parent="menu_pricing_rules_root"
+              action="action_distance_pricelist" sequence="2"/>
+
+    <menuitem id="menu_weight_pricelist" name="Weight Pricelist"
+              parent="menu_pricing_rules_root"
+              action="action_weight_pricelist" sequence="3"/>
+
+    <!-- Operations (order 3) -->
+    <menuitem id="menu_codeware_ops" name="Operations" parent="menu_codeware_root" sequence="3"/>
+    <menuitem id="menu_codeware_requests" name="Requests" parent="menu_codeware_ops" action="action_request"
+              sequence="1"/>
+    <menuitem id="menu_request_order" name="Request Orders" parent="menu_codeware_ops" action="action_request_order"
+              sequence="2"/>
+
+
+    <!-- List view -->
+    <record id="view_courier_company_list" model="ir.ui.view">
+        <field name="name">codeware.courier.company.list</field>
+        <field name="model">codeware.courier.company</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="contact_person"/>
+                <field name="phone"/>
+                <field name="courier_product_id" widget="many2one" options="{'no_create': False}"/>
+                <field name="email"/>
+                <field name="active"/>
+                <field name="internal" string="Internal"/>
+
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_courier_company_form" model="ir.ui.view">
+        <field name="name">codeware.courier.company.form</field>
+        <field name="model">codeware.courier.company</field>
+        <field name="arch" type="xml">
+            <form string="Courier Company">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id" options="{'no_create': False}"/>
+                    </group>
+                    <group>
+                        <field name="contact_person"/>
+                        <field name="phone"/>
+                        <field name="courier_product_id" widget="many2one" options="{'no_create': False}"/>
+                        <field name="email"/>
+                        <field name="active"/>
+                        <field name="internal" string="Internal"/>
+                    </group>
+                    <group>
+                        <field name="address"/>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ========== Views: FinCode ========== -->
+    <!-- ========== Views: FinCode ========== -->
+    <record id="view_fincode_list" model="ir.ui.view">
+        <field name="name">codeware.fincode.list</field>
+        <field name="model">codeware.fincode</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="base_price"/>
+                <field name="hub_ids" widget="many2many_tags"/>
+                <field name="serviced_by_id" widget="many2one"/>
+                <field name="cod_available"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fincode_form" model="ir.ui.view">
+        <field name="name">codeware.fincode.form</field>
+        <field name="model">codeware.fincode</field>
+        <field name="arch" type="xml">
+            <form string="PinCode Master">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="city"/>
+                        <field name="state"/>
+                        <field name="base_price"/>
+                        <field name="serviced_by_id" widget="many2one"/>
+                        <!-- APPLY CONDITION HERE -->
+                        <field name="hub_ids"
+                               widget="many2many_tags"
+                               invisible="not is_internal_courier"/>
+
+                        <field name="cod_available"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ========== Views: Transit Hub ========== -->
+    <record id="view_transithub_list" model="ir.ui.view">
+        <field name="name">codeware.transithub.list</field>
+        <field name="model">codeware.transithub</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="hub_code"/>
+                <field name="sequence"/>
+                <field name="location"/>
+                <field name="stock_location_id"/>
+                <field name="pincode"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_transithub_form" model="ir.ui.view">
+        <field name="name">codeware.transithub.form</field>
+        <field name="model">codeware.transithub</field>
+        <field name="arch" type="xml">
+            <form string="Transit Hub">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="hub_code"/>
+                        <field name="sequence"/>
+                        <field name="location"/>
+                        <field name="stock_location_id"/>
+                        <field name="pincode"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ========== Views: Request (list + form) ========== -->
+    <record id="view_request_list" model="ir.ui.view">
+        <field name="name">codeware.request.list</field>
+        <field name="model">codeware.request</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <!--                <field name="delivery_tracking_number" readonly="1"/>-->
+                <field name="customer_name"/>
+                <field name="source_hub_id"/>
+                <field name="dest_zip"/>
+                <field name="serviced_by_id" readonly="1"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_request_form" model="ir.ui.view">
+        <field name="name">codeware.request.form</field>
+        <field name="model">codeware.request</field>
+        <field name="arch" type="xml">
+            <form string="Request">
+                <header>
+                    <button name="action_send_quotation"
+                            string="Send"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_confirm"
+                            string="Confirm"
+                            type="object"
+                            class="btn-success"
+                            invisible="state == 'confirmed'"
+                            confirm="Are you sure you want to confirm this request? Please review all details carefully. Once confirmed, the request cannot be modified or reversed."/>
+
+                    <button name="action_create_payment"
+                            string="Pay"
+                            type="object"
+                            class="btn-primary"
+                            invisible="is_fully_paid"/>
+
+                    <button name="action_print_request"
+                            string="Print"
+                            type="object"
+                            class="btn-secondary"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,sent,confirmed"
+                           options="{'clickable': false}"/>
+                </header>
+
+                <sheet>
+
+                    <!-- SMART BUTTON ZONE (correct placement) -->
+                    <div class="oe_button_box" name="button_box">
+
+                        <button type="object"
+                                name="action_view_request_order"
+                                class="oe_stat_button"
+                                icon="fa-file"
+                                invisible="state != 'confirmed'">
+                            <field name="request_order_count" widget="statinfo" string="Request Order"/>
+                        </button>
+
+                        <button type="object"
+                                name="action_open_sale_order"
+                                class="oe_stat_button"
+                                invisible="state != 'confirmed'"
+                                icon="fa-shopping-cart">
+                            <field name="sale_count" widget="statinfo" string="Sale Order"/>
+                        </button>
+
+                        <button type="object"
+                                name="action_open_payments"
+                                class="oe_stat_button"
+                                invisible="not is_fully_paid"
+                                icon="fa-credit-card">
+                            <field name="payment_count" widget="statinfo" string="Payments"/>
+                        </button>
+
+                    </div>
+                    <!-- END SMART BUTTON ZONE -->
+
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="partner_id" required="1"/>
+                        <field name="tracking_number" readonly="1"/>
+                        <field name="source_hub_id"/>
+                        <field name="zip_input" placeholder="Type PIN and press Enter"/>
+                        <field name="dest_fincode_id" required="1"/>
+                        <field name="priority_type"
+                               readonly="1"
+                               placeholder="Auto-filled from Price Lines"/>
+                        <field name="dest_zip" invisible="1"/>
+                        <field name="serviced_by_id" readonly="1"/>
+                        <field name="primary_payment_id" readonly="1"/>
+                        <field name="payment_ids" widget="many2many_tags" readonly="1"/>
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="sender_name" invisible="1"/>
+                            <field name="sender_phone_partner" invisible="1"/>
+                            <field name="sender_phone"/>
+                            <field name="sender_address" required="1"/>
+                        </group>
+                        <group>
+                            <field name="receiver_id"/>
+                            <field name="customer_name" invisible="1"/>
+                            <field name="receiver_phone_partner" invisible="1"/>
+                            <field name="receiver_phone"/>
+                            <field name="customer_address" required="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="city" readonly="1"/>
+                        <field name="state_name" readonly="1"/>
+                        <field name="base_price"/>
+                        <field name="delivery_description"/>
+
+                        <!--                        <field name="transit_hub_ids" widget="many2many_tags" readonly="1"/>-->
+                        <!--                        <field name="final_transit_hub" readonly="1"/>-->
+
+                    </group>
+
+                    <notebook>
+                        <page string="Price Lines">
+                            <field name="line_ids" domain="[('is_courier_hidden','=',False)]">
+
+                                <!-- LIST: hide row by hiding each field -->
+                                <list editable="bottom" delete="0">
+                                    <field name="product_id" invisible="is_courier_hidden"/>
+                                    <field name="weight" invisible="is_courier_hidden"/>
+                                    <field name="distance_km" invisible="is_courier_hidden"/>
+                                    <field name="priority" invisible="is_courier_hidden"/>
+                                    <field name="price_rule_id" column_invisible="1" invisible="is_courier_hidden"/>
+                                    <field name="unit_price" invisible="is_courier_hidden"/>
+                                    <field name="is_cod" column_invisible="1" invisible="is_courier_hidden"/>
+                                    <field name="cod_amount" column_invisible="1" invisible="is_courier_hidden"/>
+                                    <field name="weight_cost" readonly="1" invisible="is_courier_hidden"/>
+                                    <field name="distance_cost" readonly="1" invisible="is_courier_hidden"/>
+                                    <field name="price_subtotal" invisible="is_courier_hidden"/>
+
+                                    <!-- must exist in the tree for invisible logic -->
+                                    <field name="is_courier_hidden" column_invisible="1"/>
+                                </list>
+
+                                <!-- FORM: hide fields the same way -->
+                                <form>
+                                    <group>
+                                        <field name="product_id" invisible="is_courier_hidden"/>
+                                        <field name="weight" invisible="is_courier_hidden"/>
+                                        <field name="distance_km" invisible="is_courier_hidden"/>
+                                        <field name="priority" invisible="is_courier_hidden"/>
+                                        <field name="price_rule_id" invisible="1"/>
+                                        <field name="unit_price" invisible="is_courier_hidden"/>
+                                        <field name="is_cod" invisible="1"/>
+                                        <field name="cod_amount" invisible="1"/>
+                                        <field name="weight_cost" readonly="1" invisible="is_courier_hidden"/>
+                                        <field name="distance_cost" readonly="1" invisible="is_courier_hidden"/>
+                                        <field name="price_subtotal" invisible="is_courier_hidden"/>
+
+                                        <!-- again required -->
+                                        <!--                                        <field name="is_courier_hidden" column_invisible="1"/>-->
+                                    </group>
+                                </form>
+
+                            </field>
+                        </page>
+
+                        <!--                        <page string="Totals">-->
+                        <!--                            <group>-->
+                        <!--                                <field name="amount_total" readonly="1"/>-->
+                        <!--                            </group>-->
+                        <!--                        </page>-->
+
+                        <!--                        <page string="Tracking">-->
+                        <!--                            <group>-->
+                        <!--                                <field name="tracking_number" readonly="1"/>-->
+                        <!--                                <field name="barcode_image" widget="image" readonly="1"/>-->
+                        <!--                            </group>-->
+                        <!--                        </page>-->
+                    </notebook>
+
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========== Views: Request Order (list + form) ========== -->
+    <record id="view_request_order_list" model="ir.ui.view">
+        <field name="name">codeware.request.order.list</field>
+        <field name="model">codeware.request.order</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="request_id"/>
+                <field name="partner_id"/>
+                <field name="sender_name"/>
+                <field name="customer_name"/>
+                <field name="source_hub_id"/>
+                <field name="dest_zip"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_request_order_form" model="ir.ui.view">
+        <field name="name">codeware.request.order.form</field>
+        <field name="model">codeware.request.order</field>
+        <field name="arch" type="xml">
+            <form string="Request Order">
+                <header>
+                    <button name="action_print_pdf" string="Print" type="object" class="btn-default"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="request_id"/>
+                        <field name="partner_id"/>
+                        <field name="sender_name"/>
+                        <field name="sender_address"/>
+                        <field name="customer_name"/>
+                        <field name="customer_address"/>
+                        <field name="source_hub_id"/>
+                        <field name="dest_zip"/>
+                        <field name="city"/>
+                        <field name="state_name"/>
+                        <field name="total_amount"/>
+                        <field name="state"/>
+                        <!--                        <field name="tracking_number" readonly="1"/>-->
+                        <!--                        <field name="barcode_image" widget="image" readonly="1"/>-->
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!--           PRIORITY / DISTANCE / WEIGHT PRICELIST         -->
+    <!-- ========================================================= -->
+
+    <record id="view_priority_pricelist_list" model="ir.ui.view">
+        <field name="name">codeware.priority.pricelist.list</field>
+        <field name="model">codeware.priority.pricelist</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="rules"/>
+                <field name="priority_type"/>
+                <field name="cost"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_priority_pricelist_form" model="ir.ui.view">
+        <field name="name">codeware.priority.pricelist.form</field>
+        <field name="model">codeware.priority.pricelist</field>
+        <field name="arch" type="xml">
+            <form string="Priority Pricelist">
+                <sheet>
+                    <group>
+                        <field name="rules"/>
+                        <field name="priority_type"/>
+                        <field name="cost"/>
+                        <field name="status"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_distance_pricelist_list" model="ir.ui.view">
+        <field name="name">codeware.distance.pricelist.list</field>
+        <field name="model">codeware.distance.pricelist</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="min_distance"/>
+                <field name="max_distance"/>
+                <field name="cost"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_distance_pricelist_form" model="ir.ui.view">
+        <field name="name">codeware.distance.pricelist.form</field>
+        <field name="model">codeware.distance.pricelist</field>
+        <field name="arch" type="xml">
+            <form string="Distance Pricelist">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="min_distance"/>
+                        <field name="max_distance"/>
+                        <field name="cost"/>
+                        <field name="status"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Corrected: Pricing Rule list view -->
+    <record id="view_pricing_list" model="ir.ui.view">
+        <field name="name">codeware.pricing.rule.list</field>
+        <field name="model">codeware.pricing.rule</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="priority_type"/>
+                <field name="min_weight"/>
+                <field name="max_weight"/>
+                <field name="price_per_kg"/>
+                <field name="discount_percent"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Corrected: Pricing Rule form view -->
+    <record id="view_pricing_form" model="ir.ui.view">
+        <field name="name">codeware.pricing.rule.form</field>
+        <field name="model">codeware.pricing.rule</field>
+        <field name="arch" type="xml">
+            <form string="Pricing Rule">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="priority_type"/>
+                        <field name="min_weight"/>
+                        <field name="max_weight"/>
+                        <field name="price_per_kg"/>
+                        <field name="discount_percent"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_weight_pricelist_list" model="ir.ui.view">
+        <field name="name">codeware.weight.pricelist.list</field>
+        <field name="model">codeware.weight.pricelist</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="min_weight"/>
+                <field name="max_weight"/>
+                <field name="cost"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_weight_pricelist_form" model="ir.ui.view">
+        <field name="name">codeware.weight.pricelist.form</field>
+        <field name="model">codeware.weight.pricelist</field>
+        <field name="arch" type="xml">
+            <form string="Weight Pricelist">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="min_weight"/>
+                        <field name="max_weight"/>
+                        <field name="cost"/>
+                        <field name="status"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>
+
+
+        <!--<?xml version="1.0" encoding="utf-8"?>-->
+        <!--<odoo>-->
+        <!--    &lt;!&ndash; ========== Actions ========== &ndash;&gt;-->
+        <!--    <record id="action_fincode" model="ir.actions.act_window">-->
+        <!--        <field name="name">ZipCode Master</field>-->
+        <!--        <field name="res_model">codeware.fincode</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+        <!--    <record id="action_transit_hub" model="ir.actions.act_window">-->
+        <!--        <field name="name">Transit Hubs</field>-->
+        <!--        <field name="res_model">codeware.transithub</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+
+        <!--    <record id="action_request" model="ir.actions.act_window">-->
+        <!--        <field name="name">Requests</field>-->
+        <!--        <field name="res_model">codeware.request</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+        <!--    <record id="action_request_order" model="ir.actions.act_window">-->
+        <!--        <field name="name">Request Orders</field>-->
+        <!--        <field name="res_model">codeware.request.order</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+
+        <!--    <record id="action_priority_pricelist" model="ir.actions.act_window">-->
+        <!--        <field name="name">Priority Pricelist</field>-->
+        <!--        <field name="res_model">codeware.priority.pricelist</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+        <!--    <record id="action_distance_pricelist" model="ir.actions.act_window">-->
+        <!--        <field name="name">Distance Pricelist</field>-->
+        <!--        <field name="res_model">codeware.distance.pricelist</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+        <!--    <record id="action_weight_pricelist" model="ir.actions.act_window">-->
+        <!--        <field name="name">Weight Pricelist</field>-->
+        <!--        <field name="res_model">codeware.weight.pricelist</field>-->
+        <!--        <field name="view_mode">list,form</field>-->
+        <!--    </record>-->
+
+
+        <!--    &lt;!&ndash; MAIN ROOT &ndash;&gt;-->
+        <!--    <menuitem id="menu_codeware_root" name="Courier Management" sequence="1"/>-->
+
+        <!--    &lt;!&ndash; Setup (order 1) &ndash;&gt;-->
+        <!--    <menuitem id="menu_codeware_setup" name="Setup" parent="menu_codeware_root" sequence="1"/>-->
+        <!--    <menuitem id="menu_codeware_fincode" name="ZipCode Master" parent="menu_codeware_setup" action="action_fincode"-->
+        <!--              sequence="1"/>-->
+        <!--    <menuitem id="menu_codeware_hubs" name="Transit Hubs" parent="menu_codeware_setup" action="action_transit_hub"-->
+        <!--              sequence="2"/>-->
+
+        <!--    &lt;!&ndash; Pricing Header (order 2) &ndash;&gt;-->
+        <!--    &lt;!&ndash; add groups="base.group_user" only if you want all internal users to see this menu;-->
+        <!--         remove groups attribute to rely purely on ACLs &ndash;&gt;-->
+        <!--    <menuitem id="menu_pricing_rules_root" name="Pricing Rules" parent="menu_codeware_root" sequence="2"-->
+        <!--              groups="base.group_user"/>-->
+
+        <!--    <menuitem id="menu_priority_pricelist" name="Priority Pricelist"-->
+        <!--              parent="menu_pricing_rules_root"-->
+        <!--              action="action_priority_pricelist" sequence="1"/>-->
+
+        <!--    <menuitem id="menu_distance_pricelist" name="Distance Pricelist"-->
+        <!--              parent="menu_pricing_rules_root"-->
+        <!--              action="action_distance_pricelist" sequence="2"/>-->
+
+        <!--    <menuitem id="menu_weight_pricelist" name="Weight Pricelist"-->
+        <!--              parent="menu_pricing_rules_root"-->
+        <!--              action="action_weight_pricelist" sequence="3"/>-->
+
+        <!--    &lt;!&ndash; Operations (order 3) &ndash;&gt;-->
+        <!--    <menuitem id="menu_codeware_ops" name="Operations" parent="menu_codeware_root" sequence="3"/>-->
+        <!--    <menuitem id="menu_codeware_requests" name="Requests" parent="menu_codeware_ops" action="action_request"-->
+        <!--              sequence="1"/>-->
+        <!--    <menuitem id="menu_request_order" name="Request Orders" parent="menu_codeware_ops" action="action_request_order"-->
+        <!--              sequence="2"/>-->
+
+
+        <!--    &lt;!&ndash; ========== Views: FinCode ========== &ndash;&gt;-->
+        <!--    <record id="view_fincode_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.fincode.list</field>-->
+        <!--        <field name="model">codeware.fincode</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="city"/>-->
+        <!--                <field name="state"/>-->
+        <!--                <field name="base_price"/>-->
+        <!--                <field name="hub_ids" widget="many2many_tags"/>-->
+        <!--                <field name="cod_available"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_fincode_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.fincode.form</field>-->
+        <!--        <field name="model">codeware.fincode</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="PinCode Master">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="city"/>-->
+        <!--                        <field name="state"/>-->
+        <!--                        <field name="base_price"/>-->
+        <!--                        <field name="hub_ids" widget="many2many_tags"/>-->
+        <!--                        <field name="cod_available"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    &lt;!&ndash; ========== Views: Transit Hub ========== &ndash;&gt;-->
+        <!--    <record id="view_transithub_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.transithub.list</field>-->
+        <!--        <field name="model">codeware.transithub</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="hub_code"/>-->
+        <!--                <field name="sequence"/>-->
+        <!--                <field name="location"/>-->
+        <!--                <field name="stock_location_id"/>-->
+        <!--                <field name="pincode"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_transithub_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.transithub.form</field>-->
+        <!--        <field name="model">codeware.transithub</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Transit Hub">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="hub_code"/>-->
+        <!--                        <field name="sequence"/>-->
+        <!--                        <field name="location"/>-->
+        <!--                        <field name="stock_location_id"/>-->
+        <!--                        <field name="pincode"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+
+        <!--    &lt;!&ndash; ========== Views: Request (list + form) ========== &ndash;&gt;-->
+        <!--    <record id="view_request_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.request.list</field>-->
+        <!--        <field name="model">codeware.request</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="partner_id"/>-->
+        <!--                &lt;!&ndash;                <field name="delivery_tracking_number" readonly="1"/>&ndash;&gt;-->
+        <!--                <field name="customer_name"/>-->
+        <!--                <field name="source_hub_id"/>-->
+        <!--                <field name="dest_zip"/>-->
+        <!--                <field name="amount_total"/>-->
+        <!--                <field name="state"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_request_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.request.form</field>-->
+        <!--        <field name="model">codeware.request</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Request">-->
+        <!--                <header>-->
+        <!--                    <button name="action_send_quotation"-->
+        <!--                            string="Send"-->
+        <!--                            type="object"-->
+        <!--                            class="btn-primary"-->
+        <!--                            invisible="state != 'draft'"/>-->
+
+        <!--                    <button name="action_confirm"-->
+        <!--                            string="Confirm"-->
+        <!--                            type="object"-->
+        <!--                            class="btn-success"/>-->
+
+        <!--                    <button name="action_create_payment"-->
+        <!--                            string="Pay"-->
+        <!--                            type="object"-->
+        <!--                            class="btn-primary"-->
+        <!--                            invisible="is_fully_paid"/>-->
+
+        <!--                    <button name="action_print_request"-->
+        <!--                            string="Print"-->
+        <!--                            type="object"-->
+        <!--                            class="btn-secondary"/>-->
+
+        <!--                    <field name="state"-->
+        <!--                           widget="statusbar"-->
+        <!--                           statusbar_visible="draft,sent,confirmed"-->
+        <!--                           options="{'clickable': false}"/>-->
+        <!--                </header>-->
+
+        <!--                <sheet>-->
+
+        <!--                    &lt;!&ndash; SMART BUTTON ZONE (correct placement) &ndash;&gt;-->
+        <!--                    <div class="oe_button_box" name="button_box">-->
+
+        <!--                        <button type="object"-->
+        <!--                                name="action_view_request_order"-->
+        <!--                                class="oe_stat_button"-->
+        <!--                                icon="fa-file"-->
+        <!--                                invisible="state != 'confirmed'">-->
+        <!--                            <field name="request_order_count" widget="statinfo" string="Request Order"/>-->
+        <!--                        </button>-->
+
+        <!--                        <button type="object"-->
+        <!--                                name="action_open_sale_order"-->
+        <!--                                class="oe_stat_button"-->
+        <!--                                invisible="state != 'confirmed'"-->
+        <!--                                icon="fa-shopping-cart">-->
+        <!--                            <field name="sale_count" widget="statinfo" string="Sale Order"/>-->
+        <!--                        </button>-->
+
+        <!--                        <button type="object"-->
+        <!--                                name="action_open_payments"-->
+        <!--                                class="oe_stat_button"-->
+        <!--                                invisible="not is_fully_paid"-->
+        <!--                                icon="fa-credit-card">-->
+        <!--                            <field name="payment_count" widget="statinfo" string="Payments"/>-->
+        <!--                        </button>-->
+
+        <!--                    </div>-->
+        <!--                    &lt;!&ndash; END SMART BUTTON ZONE &ndash;&gt;-->
+
+        <!--                    <group>-->
+        <!--                        <field name="name" readonly="1"/>-->
+        <!--                        <field name="partner_id" required="1"/>-->
+        <!--                        <field name="tracking_number" readonly="1"/>-->
+        <!--                        <field name="source_hub_id" />-->
+        <!--                        <field name="zip_input" placeholder="Type PIN and press Enter"/>-->
+        <!--                        <field name="dest_fincode_id" required="1"/>-->
+        <!--                        &lt;!&ndash;                        <field name="dest_zip" readonly="1" />&ndash;&gt;-->
+        <!--                        <field name="dest_zip" invisible="1"/>-->
+        <!--                        <field name="primary_payment_id" readonly="1"/>-->
+        <!--                        <field name="payment_ids" widget="many2many_tags" readonly="1"/>-->
+        <!--                    </group>-->
+
+        <!--                    <group>-->
+        <!--                        <group>-->
+        <!--                            <field name="sender_name" invisible="1"/>-->
+        <!--                            <field name="sender_phone_partner" invisible="1"/>-->
+        <!--                            <field name="sender_phone"/>-->
+        <!--                            <field name="sender_address" required="1"/>-->
+        <!--                        </group>-->
+        <!--                        <group>-->
+        <!--                            <field name="receiver_id"/>-->
+        <!--                            <field name="customer_name" invisible="1"/>-->
+        <!--                            <field name="receiver_phone_partner" invisible="1"/>-->
+        <!--                            <field name="receiver_phone"/>-->
+        <!--                            <field name="customer_address" required="1"/>-->
+        <!--                        </group>-->
+        <!--                    </group>-->
+
+        <!--                    <group>-->
+        <!--                        <field name="city" readonly="1"/>-->
+        <!--                        <field name="state_name" readonly="1"/>-->
+        <!--                        <field name="base_price"/>-->
+        <!--                        <field name="transit_hub_ids" widget="many2many_tags" readonly="1"/>-->
+        <!--                    </group>-->
+
+        <!--                    <notebook>-->
+        <!--                        <page string="Price Lines">-->
+        <!--                            <field name="line_ids">-->
+        <!--                                <list editable="bottom">-->
+        <!--                                    <field name="product_id"/>-->
+        <!--                                    <field name="weight"/>-->
+        <!--                                    <field name="distance_km"/>-->
+        <!--                                    <field name="priority"/>-->
+        <!--                                    <field name="price_rule_id" column_invisible="1"/>-->
+        <!--                                    <field name="unit_price"/>-->
+
+        <!--                                    <field name="is_cod" column_invisible="1"/>-->
+        <!--                                    <field name="cod_amount" column_invisible="1"/>-->
+        <!--                                    &lt;!&ndash;                                    <field name="priority"/>&ndash;&gt;-->
+        <!--                                    &lt;!&ndash;                                    <field name="priority_cost" readonly="1"/>&ndash;&gt;-->
+        <!--                                    <field name="weight_cost" readonly="1"/>-->
+        <!--                                    <field name="distance_cost" readonly="1"/>-->
+        <!--                                    <field name="price_subtotal"/>-->
+
+        <!--                                </list>-->
+        <!--                            </field>-->
+        <!--                        </page>-->
+
+        <!--&lt;!&ndash;                        <page string="Totals">&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="amount_total" readonly="1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            </group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                        </page>&ndash;&gt;-->
+
+        <!--                        &lt;!&ndash;                        <page string="Tracking">&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                            <group>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                                <field name="tracking_number" readonly="1"/>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                                <field name="barcode_image" widget="image" readonly="1"/>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                            </group>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                        </page>&ndash;&gt;-->
+        <!--                    </notebook>-->
+
+        <!--                </sheet>-->
+
+        <!--                <chatter/>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    &lt;!&ndash; ========== Views: Request Order (list + form) ========== &ndash;&gt;-->
+        <!--    <record id="view_request_order_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.request.order.list</field>-->
+        <!--        <field name="model">codeware.request.order</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="request_id"/>-->
+        <!--                <field name="partner_id"/>-->
+        <!--                <field name="sender_name"/>-->
+        <!--                <field name="customer_name"/>-->
+        <!--                <field name="source_hub_id"/>-->
+        <!--                <field name="dest_zip"/>-->
+        <!--                <field name="total_amount"/>-->
+        <!--                <field name="state"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_request_order_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.request.order.form</field>-->
+        <!--        <field name="model">codeware.request.order</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Request Order">-->
+        <!--                <header>-->
+        <!--                    <button name="action_print_pdf" string="Print" type="object" class="btn-default"/>-->
+        <!--                </header>-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="request_id"/>-->
+        <!--                        <field name="partner_id"/>-->
+        <!--                        <field name="sender_name"/>-->
+        <!--                        <field name="sender_address"/>-->
+        <!--                        <field name="customer_name"/>-->
+        <!--                        <field name="customer_address"/>-->
+        <!--                        <field name="source_hub_id"/>-->
+        <!--                        <field name="dest_zip"/>-->
+        <!--                        <field name="city"/>-->
+        <!--                        <field name="state_name"/>-->
+        <!--                        <field name="total_amount"/>-->
+        <!--                        <field name="state"/>-->
+        <!--                        &lt;!&ndash;                        <field name="tracking_number" readonly="1"/>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                        <field name="barcode_image" widget="image" readonly="1"/>&ndash;&gt;-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+
+        <!--    &lt;!&ndash; ========================================================= &ndash;&gt;-->
+        <!--    &lt;!&ndash;           PRIORITY / DISTANCE / WEIGHT PRICELIST         &ndash;&gt;-->
+        <!--    &lt;!&ndash; ========================================================= &ndash;&gt;-->
+
+        <!--    <record id="view_priority_pricelist_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.priority.pricelist.list</field>-->
+        <!--        <field name="model">codeware.priority.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="rules"/>-->
+        <!--                <field name="priority_type"/>-->
+        <!--                <field name="cost"/>-->
+        <!--                <field name="status"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_priority_pricelist_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.priority.pricelist.form</field>-->
+        <!--        <field name="model">codeware.priority.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Priority Pricelist">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="rules"/>-->
+        <!--                        <field name="priority_type"/>-->
+        <!--                        <field name="cost"/>-->
+        <!--                        <field name="status"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_distance_pricelist_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.distance.pricelist.list</field>-->
+        <!--        <field name="model">codeware.distance.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="min_distance"/>-->
+        <!--                <field name="max_distance"/>-->
+        <!--                <field name="cost"/>-->
+        <!--                <field name="status"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_distance_pricelist_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.distance.pricelist.form</field>-->
+        <!--        <field name="model">codeware.distance.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Distance Pricelist">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="min_distance"/>-->
+        <!--                        <field name="max_distance"/>-->
+        <!--                        <field name="cost"/>-->
+        <!--                        <field name="status"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    &lt;!&ndash; Corrected: Pricing Rule list view &ndash;&gt;-->
+        <!--    <record id="view_pricing_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.pricing.rule.list</field>-->
+        <!--        <field name="model">codeware.pricing.rule</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="priority_type"/>-->
+        <!--                <field name="min_weight"/>-->
+        <!--                <field name="max_weight"/>-->
+        <!--                <field name="price_per_kg"/>-->
+        <!--                <field name="discount_percent"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    &lt;!&ndash; Corrected: Pricing Rule form view &ndash;&gt;-->
+        <!--    <record id="view_pricing_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.pricing.rule.form</field>-->
+        <!--        <field name="model">codeware.pricing.rule</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Pricing Rule">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="priority_type"/>-->
+        <!--                        <field name="min_weight"/>-->
+        <!--                        <field name="max_weight"/>-->
+        <!--                        <field name="price_per_kg"/>-->
+        <!--                        <field name="discount_percent"/>-->
+        <!--                        <field name="active"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+
+        <!--    <record id="view_weight_pricelist_list" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.weight.pricelist.list</field>-->
+        <!--        <field name="model">codeware.weight.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <list>-->
+        <!--                <field name="name"/>-->
+        <!--                <field name="min_weight"/>-->
+        <!--                <field name="max_weight"/>-->
+        <!--                <field name="cost"/>-->
+        <!--                <field name="status"/>-->
+        <!--            </list>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+        <!--    <record id="view_weight_pricelist_form" model="ir.ui.view">-->
+        <!--        <field name="name">codeware.weight.pricelist.form</field>-->
+        <!--        <field name="model">codeware.weight.pricelist</field>-->
+        <!--        <field name="arch" type="xml">-->
+        <!--            <form string="Weight Pricelist">-->
+        <!--                <sheet>-->
+        <!--                    <group>-->
+        <!--                        <field name="name"/>-->
+        <!--                        <field name="min_weight"/>-->
+        <!--                        <field name="max_weight"/>-->
+        <!--                        <field name="cost"/>-->
+        <!--                        <field name="status"/>-->
+        <!--                    </group>-->
+        <!--                </sheet>-->
+        <!--            </form>-->
+        <!--        </field>-->
+        <!--    </record>-->
+
+
+        <!--</odoo>-->

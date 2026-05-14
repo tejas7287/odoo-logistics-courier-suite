@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for handoff reference -->
+    <record id="seq_courier_handoff" model="ir.sequence">
+        <field name="name">Courier Handoff</field>
+        <field name="code">courier.handoff</field>
+        <field name="prefix">HND-</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Handoff tree view -->
+    <record id="view_courier_handoff_tree" model="ir.ui.view">
+        <field name="name">courier.handoff.tree</field>
+        <field name="model">courier.handoff</field>
+        <field name="arch" type="xml">
+            <list string="Handoffs">
+                <field name="name"/>
+                <field name="picking_id"/>
+                <!--                <field name="sale_id"/>-->
+                <field name="driver_id"/>
+                <field name="vehicle_id"/>
+                <field name="state"/>
+                <field name="assigned_datetime"/>
+                <!--                <field name="delivered_datetime"/>-->
+                <field name="parcel_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Handoff form view -->
+    <record id="view_courier_handoff_form" model="ir.ui.view">
+        <field name="name">courier.handoff.form</field>
+        <field name="model">courier.handoff</field>
+        <field name="arch" type="xml">
+            <form string="Handoff">
+                <header>
+                    <button name="action_print_handoff" type="object" string="Print"
+                            class="oe_highlight"/>
+                </header>
+
+                <sheet>
+
+                    <group>
+                        <field name="name" string="Handoff Reference" readonly="1"/>
+
+                        <field name="picking_id" widget="many2many_tags" options="{'no_create': True}"
+                               readonly="1"/>
+
+                        <!--                        <field name="sale_id"/>-->
+                        <field name="partner_id"/>
+                    </group>
+                    <group>
+                        <field name="driver_id"/>
+                        <field name="vehicle_id"/>
+                        <field name="vehicle_number"/>
+                        <!--                        <field name="courier_partner_id"/>-->
+                        <!--                        <field name="manifest_ref"/>-->
+                    </group>
+                    <group>
+                        <field name="parcel_count"/>
+                        <!--            <field name="total_weight"/>-->
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="assigned_datetime"/>
+                        <!--                        <field name="picked_datetime"/>-->
+                        <!--                        <field name="delivered_datetime"/>-->
+                    </group>
+                    <group>
+<!--                        <field name="awb_number"/>-->
+                        <field name="authorized_person"/>
+                         <field name="serviced_by_id" readonly="1"/>
+                    </group>
+
+                    <group>
+                        <field name="notes" colspan="2"/>
+                    </group>
+                    <footer>
+                        <!-- Buttons left visible always. If you need conditional display, use groups or server-side logic. -->
+                        <button string="Mark Assigned" type="object" name="action_mark_assigned" class="btn-primary"/>
+                        <button string="Mark Picked" type="object" name="action_mark_picked"/>
+                        <button string="Mark Delivered" type="object" name="action_mark_delivered"/>
+                        <button string="Cancel" type="object" name="action_cancel"/>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Add Handoffs tab into stock.picking form and header smart button -->
+    <!-- Add Handoffs tab into stock.picking form and header smart button -->
+    <record id="view_picking_form_inherit_handoffs" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.handoffs</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object"
+                        name="action_open_handoffs"
+                        class="oe_stat_button"
+                        icon="fa-truck"
+                        invisible="state != 'done'">
+                    <field name="handoff_count" widget="statinfo" string="Handoffs"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Handoffs">
+                    <field name="handoff_ids" nolabel="1">
+                        <list editable="bottom" create="true" delete="true">
+                            <field name="name"/>
+                            <field name="driver_id"/>
+                            <field name="vehicle_id"/>
+                            <field name="vehicle_number"/>
+                            <!--                            <field name="state"/>-->
+                            <field name="assigned_datetime"/>
+                            <field name="delivered_datetime"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- Action to open handoffs (used by menus) -->
+    <record id="action_courier_handoffs" model="ir.actions.act_window">
+        <field name="name">Courier Handoffs</field>
+        <field name="res_model">courier.handoff</field>
+        <field name="view_mode">list,form</field>
+        <field name="help">Manage courier handoffs</field>
+    </record>
+
+    <!-- Menu items -->
+    <menuitem id="menu_courier_root" name="HandOffs" sequence="90" parent="stock.menu_stock_transfers"/>
+    <menuitem id="menu_courier_handoffs" name="Handoffs" parent="menu_courier_root" action="action_courier_handoffs"/>
+
+</odoo>
+
+
+        <!--<?xml version="1.0" encoding="utf-8"?>-->
+        <!--<odoo>-->
+        <!--  &lt;!&ndash; Sequence for handoff reference &ndash;&gt;-->
+        <!--  <record id="seq_courier_handoff" model="ir.sequence">-->
+        <!--    <field name="name">Courier Handoff</field>-->
+        <!--    <field name="code">courier.handoff</field>-->
+        <!--    <field name="prefix">HND-</field>-->
+        <!--    <field name="padding">5</field>-->
+        <!--    <field name="company_id" eval="False"/>-->
+        <!--  </record>-->
+
+        <!--  &lt;!&ndash; Handoff tree view &ndash;&gt;-->
+        <!--  <record id="view_courier_handoff_tree" model="ir.ui.view">-->
+        <!--    <field name="name">courier.handoff.tree</field>-->
+        <!--    <field name="model">courier.handoff</field>-->
+        <!--    <field name="arch" type="xml">-->
+        <!--      <list string="Handoffs">-->
+        <!--        <field name="name"/>-->
+        <!--        <field name="picking_id"/>-->
+        <!--        <field name="sale_id"/>-->
+        <!--        <field name="driver_id"/>-->
+        <!--        <field name="vehicle_id"/>-->
+        <!--        <field name="state"/>-->
+        <!--        <field name="assigned_datetime"/>-->
+        <!--        <field name="delivered_datetime"/>-->
+        <!--        <field name="parcel_count"/>-->
+        <!--      </list>-->
+        <!--    </field>-->
+        <!--  </record>-->
+
+        <!--  &lt;!&ndash; Handoff form view &ndash;&gt;-->
+        <!--  <record id="view_courier_handoff_form" model="ir.ui.view">-->
+        <!--    <field name="name">courier.handoff.form</field>-->
+        <!--    <field name="model">courier.handoff</field>-->
+        <!--    <field name="arch" type="xml">-->
+        <!--      <form string="Handoff">-->
+        <!--        <sheet>-->
+        <!--          <group>-->
+        <!--            <field name="name" readonly="1"/>-->
+        <!--            <field name="picking_id" readonly="1"/>-->
+        <!--            <field name="sale_id" readonly="1"/>-->
+        <!--            <field name="partner_id" readonly="1"/>-->
+        <!--          </group>-->
+        <!--          <group>-->
+        <!--            <field name="driver_id"/>-->
+        <!--            <field name="vehicle_id"/>-->
+        <!--            <field name="courier_partner_id"/>-->
+        <!--            <field name="manifest_ref"/>-->
+        <!--          </group>-->
+        <!--          <group>-->
+        <!--            <field name="parcel_count"/>-->
+        <!--            <field name="total_weight"/>-->
+        <!--            <field name="state"/>-->
+        <!--          </group>-->
+        <!--          <group>-->
+        <!--            <field name="assigned_datetime"/>-->
+        <!--            <field name="picked_datetime"/>-->
+        <!--            <field name="delivered_datetime"/>-->
+        <!--          </group>-->
+        <!--          <group>-->
+        <!--            <field name="notes" colspan="2"/>-->
+        <!--          </group>-->
+        <!--          <footer>-->
+        <!--            <button string="Mark Assigned" type="object" name="action_mark_assigned"-->
+        <!--                    attrs="{'invisible': [('state','!=','draft')]}" class="btn-primary"/>-->
+        <!--            <button string="Mark Picked" type="object" name="action_mark_picked"-->
+        <!--                    attrs="{'invisible':[('state','!=','assigned')]}"/>-->
+        <!--            <button string="Mark Delivered" type="object" name="action_mark_delivered"-->
+        <!--                    attrs="{'invisible':[('state','!=','picked')]}"/>-->
+        <!--            <button string="Cancel" type="object" name="action_cancel"-->
+        <!--                    attrs="{'invisible':[('state','=','cancel')]}"/>-->
+        <!--            <button string="Close" class="btn-secondary" special="cancel"/>-->
+        <!--          </footer>-->
+        <!--        </sheet>-->
+        <!--      </form>-->
+        <!--    </field>-->
+        <!--  </record>-->
+
+        <!--  &lt;!&ndash; Add Handoffs tab into stock.picking form and header smart button &ndash;&gt;-->
+        <!--  <record id="view_picking_form_inherit_handoffs" model="ir.ui.view">-->
+        <!--    <field name="name">stock.picking.form.inherit.handoffs</field>-->
+        <!--    <field name="model">stock.picking</field>-->
+        <!--    <field name="inherit_id" ref="stock.view_picking_form"/>-->
+        <!--    <field name="arch" type="xml">-->
+        <!--      &lt;!&ndash; Insert header button &ndash;&gt;-->
+        <!--      <xpath expr="//header" position="inside">-->
+        <!--        <button name="action_open_handoffs" type="object"-->
+        <!--                class="oe_stat_button"-->
+        <!--                icon="fa-truck"-->
+        <!--                string="Handoffs (%(handoff_count)s)"/>-->
+        <!--      </xpath>-->
+
+        <!--      &lt;!&ndash; Insert Handoffs tab &ndash;&gt;-->
+        <!--      <xpath expr="//notebook" position="inside">-->
+        <!--        <page string="Handoffs">-->
+        <!--          <field name="handoff_ids" nolabel="1">-->
+        <!--            <tree editable="bottom" create="true" delete="true">-->
+        <!--              <field name="name"/>-->
+        <!--              <field name="driver_id"/>-->
+        <!--              <field name="vehicle_id"/>-->
+        <!--              <field name="state"/>-->
+        <!--              <field name="assigned_datetime"/>-->
+        <!--              <field name="delivered_datetime"/>-->
+        <!--            </tree>-->
+        <!--          </field>-->
+        <!--        </page>-->
+        <!--      </xpath>-->
+        <!--    </field>-->
+        <!--  </record>-->
+
+        <!--  &lt;!&ndash; Action to open handoffs (used by menus) &ndash;&gt;-->
+        <!--  <record id="action_courier_handoffs" model="ir.actions.act_window">-->
+        <!--    <field name="name">Courier Handoffs</field>-->
+        <!--    <field name="res_model">courier.handoff</field>-->
+        <!--    <field name="view_mode">tree,form</field>-->
+        <!--    <field name="help">Manage courier handoffs</field>-->
+        <!--  </record>-->
+
+        <!--  &lt;!&ndash; Menu items &ndash;&gt;-->
+        <!--  <menuitem id="menu_courier_root" name="Courier" sequence="90"/>-->
+        <!--  <menuitem id="menu_courier_handoffs" name="Handoffs" parent="menu_courier_root" action="action_courier_handoffs"/>-->
+
+        <!--</odoo>-->

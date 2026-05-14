@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_hide_courier_lines" model="ir.ui.view">
+        <field name="name">sale.order.hide.courier.lines</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+                        <xpath expr="//field[@name='order_line']//list" position="replace">
+                            <list string="Sales Order Lines" editable="bottom" >
+
+                                <field name="product_id" invisible="is_courier_hidden"/>
+                                <field name="name" invisible="is_courier_hidden"/>
+                                <field name="product_uom_qty" invisible="is_courier_hidden"/>
+                                <field name="product_uom_id" invisible="is_courier_hidden"/>  <!-- FIXED -->
+                                <!--                    <field name="qty_delivered" invisible="is_courier_hidden"/>-->
+                                <!--                    <field name="qty_invoiced" invisible="is_courier_hidden"/>-->
+                                <field name="price_unit" invisible="is_courier_hidden"/>
+                                <field name="discount" invisible="is_courier_hidden"/>
+                                <field name="tax_ids" invisible="is_courier_hidden"/>
+                                <!--                    <field name="price_subtotal" invisible="is_courier_hidden"/>-->
+                                <field name="price_total" invisible="is_courier_hidden"/>
+                                <!-- Required hidden flag -->
+                                <!--                    <field name="is_courier_hidden" />-->
+
+                            </list>
+                        </xpath>
+
+        </field>
+    </record>
+</odoo>

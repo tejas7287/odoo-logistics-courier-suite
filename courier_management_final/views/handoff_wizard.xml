@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--         Wizard Form -->
+        <record id="view_handoff_wizard_form" model="ir.ui.view">
+            <field name="name">handoff.wizard.form</field>
+            <field name="model">handoff.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Handoff">
+                    <sheet>
+                        <group>
+                            <group>
+                                <!-- ✅ ALL OPERATION TYPES -->
+                                <field name="picking_type_id"/>
+
+                                <!-- ✅ PICKINGS BASED ON OPERATION -->
+                                <field name="picking_id"
+                                       widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                                <!--                                <field name="sale_id" readonly="1"/>-->
+                                <field name="name" readonly="1"/>
+                                <!--                                <field name="state"/>-->
+                            </group>
+
+                            <group>
+                                <field name="vehicle_number" invisible="internal != 1"/>
+                                <field name="driver_id" invisible="internal != 1"/>
+                                <field name="vehicle_id" invisible="internal != 1"/>
+                                <!--                                <field name="courier_partner_id"/>-->
+                                <!--                                <field name="manifest_ref"/>-->
+                            </group>
+                        </group>
+
+                        <group>
+                            <field name="parcel_count"/>
+                            <field name="assigned_datetime" invisible="internal != 1"/>
+
+                            <field name="picked_datetime"/>
+                            <!--                            <field name="awb_number"/>-->
+                            <field name="serviced_by_id" readonly="1"/>
+                            <field name="authorized_person" invisible=" internal ==1 "/>
+                        </group>
+
+                        <group>
+                            <field name="notes" colspan="2"/>
+                        </group>
+
+                        <footer>
+                            <button string="Confirm"
+                                    type="object"
+                                    name="action_confirm_handoff"
+                                    class="btn-primary"
+                                    confirm="Are you sure you want to confirm the handoff? Once confirmed, products will be moved to the selected location."/>
+                            <button string="Cancel"
+                                    class="btn-secondary"
+                                    special="cancel"/>
+                            <!--                            <button string="Print"-->
+                            <!--                                    type="object"-->
+                            <!--                                    name="action_print_handoff_wizard"-->
+                            <!--                                    icon="fa-print"-->
+                            <!--                                    class="btn-secondary"/>-->
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <!-- Act Window -->
+        <record id="action_handoff_wizard" model="ir.actions.act_window">
+            <field name="name">Create Handoff</field>
+            <field name="res_model">handoff.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_handoff_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--        &lt;!&ndash; Server action &ndash;&gt;-->
+        <!--        <record id="action_delivery_create_handoff" model="ir.actions.server">-->
+        <!--            <field name="name">Create Handoff</field>-->
+        <!--            <field name="model_id" ref="stock.model_stock_picking"/>-->
+        <!--            <field name="binding_model_id" ref="stock.model_stock_picking"/>-->
+        <!--&lt;!&ndash;            <field name="binding_view_types">list,form</field>&ndash;&gt;-->
+        <!--            <field name="state">action</field>-->
+        <!--            <field name="action_id" ref="action_handoff_wizard"/>-->
+        <!--        </record>-->
+
+        <!--        <record id="action_delivery_create_handoff_code" model="ir.actions.server">-->
+        <!--    <field name="name">Create Handoff (code)</field>-->
+        <!--    <field name="model_id" ref="stock.model_stock_picking"/>-->
+        <!--    <field name="binding_model_id" ref="stock.model_stock_picking"/>-->
+        <!--    <field name="binding_view_types">form,list,kanban</field>  &lt;!&ndash; allowed for code actions &ndash;&gt;-->
+        <!--    <field name="state">code</field>-->
+        <!--    <field name="code">-->
+        <!--# Python code executed by the server action:-->
+        <!--# open the handoff wizard for selected pickings-->
+        <!--action = {-->
+        <!--    'type': 'ir.actions.act_window',-->
+        <!--    'name': 'Create Handoff',-->
+        <!--    'res_model': 'handoff.wizard',-->
+        <!--    'view_mode': 'form',-->
+        <!--    'target': 'new',-->
+        <!--    'context': {'default_picking_id': active_id or (active_ids and active_ids[0])},-->
+        <!--}-->
+        <!--    </field>-->
+        <!--</record>-->
+
+        <record id="action_delivery_create_handoff" model="ir.actions.server">
+            <field name="name">Create Handoff</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">form,list</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+active_ids = env.context.get('active_ids') or []
+active_id = env.context.get('active_id') or (active_ids[0] if active_ids else False)
+
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Create Handoff',
+    'res_model': 'handoff.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_picking_id': active_id,
+        'active_ids': active_ids,
+        'active_id': active_id,
+    },
+}
+    ]]></field>
+        </record>
+
+
+    </data>
+</odoo>
+
+
+        <!--<?xml version="1.0" encoding="utf-8"?>-->
+        <!--<odoo>-->
+        <!--    <data>-->
+
+        <!--        &lt;!&ndash;         Wizard Form &ndash;&gt;-->
+        <!--        <record id="view_handoff_wizard_form" model="ir.ui.view">-->
+        <!--            <field name="name">handoff.wizard.form</field>-->
+        <!--            <field name="model">handoff.wizard</field>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <form string="Create Handoff">-->
+        <!--                    <sheet>-->
+        <!--                        <group>-->
+        <!--                            <group>-->
+        <!--                                <field name="picking_id" widget="many2many_tags" options="{'no_create': True}"/>-->
+        <!--                                <field name="name" readonly="1"/>-->
+        <!--                                &lt;!&ndash;                                <field name="state"/>&ndash;&gt;-->
+        <!--                            </group>-->
+        <!--                            <group>-->
+        <!--                                <field name="vehicle_number" invisible="internal != 1"/>-->
+        <!--                                <field name="driver_id" invisible="internal != 1"/>-->
+        <!--                                <field name="vehicle_id" invisible="internal != 1"/>-->
+        <!--                                &lt;!&ndash;                                <field name="courier_partner_id"/>&ndash;&gt;-->
+        <!--                                &lt;!&ndash;                                <field name="manifest_ref"/>&ndash;&gt;-->
+        <!--                            </group>-->
+        <!--                        </group>-->
+
+        <!--                        <group>-->
+        <!--                            <field name="parcel_count"/>-->
+        <!--                            <field name="assigned_datetime" invisible="internal != 1"/>-->
+
+        <!--                            <field name="picked_datetime"/>-->
+        <!--                            &lt;!&ndash;                         <field name="delivered_datetime"/>&ndash;&gt;-->
+        <!--                            <field name="awb_number"/>-->
+        <!--                            <field name="serviced_by_id" readonly="1"/>-->
+        <!--                            <field name="authorized_person"/>-->
+        <!--                        </group>-->
+
+        <!--                        <group>-->
+        <!--                            <field name="notes" colspan="2"/>-->
+        <!--                        </group>-->
+
+        <!--                        <footer>-->
+        <!--                            <button string="Confirm"-->
+        <!--                                    type="object"-->
+        <!--                                    name="action_confirm_handoff"-->
+        <!--                                    class="btn-primary"/>-->
+        <!--                            <button string="Cancel"-->
+        <!--                                    class="btn-secondary"-->
+        <!--                                    special="cancel"/>-->
+        <!--&lt;!&ndash;                            <button string="Print"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    type="object"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    name="action_print_handoff_wizard"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    icon="fa-print"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    class="btn-secondary"/>&ndash;&gt;-->
+        <!--                        </footer>-->
+        <!--                    </sheet>-->
+        <!--                </form>-->
+        <!--            </field>-->
+        <!--        </record>-->
+
+
+        <!--        &lt;!&ndash; Act Window &ndash;&gt;-->
+        <!--        <record id="action_handoff_wizard" model="ir.actions.act_window">-->
+        <!--            <field name="name">Create Handoff</field>-->
+        <!--            <field name="res_model">handoff.wizard</field>-->
+        <!--            <field name="view_mode">form</field>-->
+        <!--            <field name="view_id" ref="view_handoff_wizard_form"/>-->
+        <!--            <field name="target">new</field>-->
+        <!--        </record>-->
+
+        <!--        -->
+
+        <!--        <record id="action_delivery_create_handoff" model="ir.actions.server">-->
+        <!--            <field name="name">Create Handoff</field>-->
+        <!--            <field name="model_id" ref="stock.model_stock_picking"/>-->
+        <!--            <field name="binding_model_id" ref="stock.model_stock_picking"/>-->
+        <!--            <field name="binding_view_types">form,list</field>-->
+        <!--            <field name="state">code</field>-->
+        <!--            <field name="code"><![CDATA[-->
+        <!--active_ids = env.context.get('active_ids') or []-->
+        <!--active_id = env.context.get('active_id') or (active_ids[0] if active_ids else False)-->
+
+        <!--action = {-->
+        <!--    'type': 'ir.actions.act_window',-->
+        <!--    'name': 'Create Handoff',-->
+        <!--    'res_model': 'handoff.wizard',-->
+        <!--    'view_mode': 'form',-->
+        <!--    'target': 'new',-->
+        <!--    'context': {-->
+        <!--        'default_picking_id': active_id,-->
+        <!--        'active_ids': active_ids,-->
+        <!--        'active_id': active_id,-->
+        <!--    },-->
+        <!--}-->
+        <!--    ]]></field>-->
+        <!--        </record>-->
+
+
+        <!--    </data>-->
+        <!--</odoo>-->
+
+
+        <!--<?xml version="1.0" encoding="utf-8"?>-->
+        <!--<odoo>-->
+        <!--    <data>-->
+
+        <!--        &lt;!&ndash;         Wizard Form &ndash;&gt;-->
+        <!--        <record id="view_handoff_wizard_form" model="ir.ui.view">-->
+        <!--            <field name="name">handoff.wizard.form</field>-->
+        <!--            <field name="model">handoff.wizard</field>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <form string="Create Handoff">-->
+        <!--                    <sheet>-->
+        <!--                        <group>-->
+        <!--                            <group>-->
+        <!--                                <field name="picking_mode"/>-->
+        <!--                                <field name="picking_id" widget="many2many_tags" options="{'no_create': True}"/>-->
+        <!--                                &lt;!&ndash;                                <field name="sale_id" readonly="1"/>&ndash;&gt;-->
+        <!--                                <field name="name" readonly="1"/>-->
+        <!--                                &lt;!&ndash;                                <field name="state"/>&ndash;&gt;-->
+        <!--                            </group>-->
+
+        <!--                            <group>-->
+        <!--                                <field name="vehicle_number" invisible="internal != 1"/>-->
+        <!--                                <field name="driver_id" invisible="internal != 1"/>-->
+        <!--                                <field name="vehicle_id" invisible="internal != 1"/>-->
+        <!--                                &lt;!&ndash;                                <field name="courier_partner_id"/>&ndash;&gt;-->
+        <!--                                &lt;!&ndash;                                <field name="manifest_ref"/>&ndash;&gt;-->
+        <!--                            </group>-->
+        <!--                        </group>-->
+
+        <!--                        <group>-->
+        <!--                            <field name="parcel_count"/>-->
+        <!--                            <field name="assigned_datetime" invisible="internal != 1"/>-->
+
+        <!--                            <field name="picked_datetime"/>-->
+        <!--                            &lt;!&ndash;                         <field name="delivered_datetime"/>&ndash;&gt;-->
+        <!--                            <field name="awb_number"/>-->
+        <!--                            <field name="serviced_by_id" readonly="1"/>-->
+        <!--                            <field name="authorized_person"/>-->
+        <!--                        </group>-->
+
+        <!--                        <group>-->
+        <!--                            <field name="notes" colspan="2"/>-->
+        <!--                        </group>-->
+
+        <!--                        <footer>-->
+        <!--                            <button string="Confirm"-->
+        <!--                                    type="object"-->
+        <!--                                    name="action_confirm_handoff"-->
+        <!--                                    class="btn-primary"/>-->
+        <!--                            <button string="Cancel"-->
+        <!--                                    class="btn-secondary"-->
+        <!--                                    special="cancel"/>-->
+        <!--                            &lt;!&ndash;                            <button string="Print"&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    type="object"&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    name="action_print_handoff_wizard"&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    icon="fa-print"&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    class="btn-secondary"/>&ndash;&gt;-->
+        <!--                        </footer>-->
+        <!--                    </sheet>-->
+        <!--                </form>-->
+        <!--            </field>-->
+        <!--        </record>-->
+
+
+        <!--        &lt;!&ndash; Act Window &ndash;&gt;-->
+        <!--        <record id="action_handoff_wizard" model="ir.actions.act_window">-->
+        <!--            <field name="name">Create Handoff</field>-->
+        <!--            <field name="res_model">handoff.wizard</field>-->
+        <!--            <field name="view_mode">form</field>-->
+        <!--            <field name="view_id" ref="view_handoff_wizard_form"/>-->
+        <!--            <field name="target">new</field>-->
+        <!--        </record>-->
+
+        <!--        &lt;!&ndash;        &lt;!&ndash; Server action &ndash;&gt;&ndash;&gt;-->
+        <!--        &lt;!&ndash;        <record id="action_delivery_create_handoff" model="ir.actions.server">&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <field name="name">Create Handoff</field>&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <field name="model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <field name="binding_model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--        &lt;!&ndash;&lt;!&ndash;            <field name="binding_view_types">list,form</field>&ndash;&gt;&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <field name="state">action</field>&ndash;&gt;-->
+        <!--        &lt;!&ndash;            <field name="action_id" ref="action_handoff_wizard"/>&ndash;&gt;-->
+        <!--        &lt;!&ndash;        </record>&ndash;&gt;-->
+
+        <!--        &lt;!&ndash;        <record id="action_delivery_create_handoff_code" model="ir.actions.server">&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="name">Create Handoff (code)</field>&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="binding_model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="binding_view_types">form,list,kanban</field>  &lt;!&ndash; allowed for code actions &ndash;&gt;&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="state">code</field>&ndash;&gt;-->
+        <!--        &lt;!&ndash;    <field name="code">&ndash;&gt;-->
+        <!--        &lt;!&ndash;# Python code executed by the server action:&ndash;&gt;-->
+        <!--        &lt;!&ndash;# open the handoff wizard for selected pickings&ndash;&gt;-->
+        <!--        &lt;!&ndash;action = {&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'type': 'ir.actions.act_window',&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'name': 'Create Handoff',&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'res_model': 'handoff.wizard',&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'view_mode': 'form',&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'target': 'new',&ndash;&gt;-->
+        <!--        &lt;!&ndash;    'context': {'default_picking_id': active_id or (active_ids and active_ids[0])},&ndash;&gt;-->
+        <!--        &lt;!&ndash;}&ndash;&gt;-->
+        <!--        &lt;!&ndash;    </field>&ndash;&gt;-->
+        <!--        &lt;!&ndash;</record>&ndash;&gt;-->
+
+        <!--        <record id="action_delivery_create_handoff" model="ir.actions.server">-->
+        <!--            <field name="name">Create Handoff</field>-->
+        <!--            <field name="model_id" ref="stock.model_stock_picking"/>-->
+        <!--            <field name="binding_model_id" ref="stock.model_stock_picking"/>-->
+        <!--            <field name="binding_view_types">form,list</field>-->
+        <!--            <field name="state">code</field>-->
+        <!--            <field name="code"><![CDATA[-->
+        <!--active_ids = env.context.get('active_ids') or []-->
+        <!--active_id = env.context.get('active_id') or (active_ids[0] if active_ids else False)-->
+
+        <!--action = {-->
+        <!--    'type': 'ir.actions.act_window',-->
+        <!--    'name': 'Create Handoff',-->
+        <!--    'res_model': 'handoff.wizard',-->
+        <!--    'view_mode': 'form',-->
+        <!--    'target': 'new',-->
+        <!--    'context': {-->
+        <!--        'default_picking_id': active_id,-->
+        <!--        'active_ids': active_ids,-->
+        <!--        'active_id': active_id,-->
+        <!--    },-->
+        <!--}-->
+        <!--    ]]></field>-->
+        <!--        </record>-->
+
+
+        <!--    </data>-->
+        <!--</odoo>-->
+
+
+        <!--&lt;!&ndash;<?xml version="1.0" encoding="utf-8"?>&ndash;&gt;-->
+        <!--&lt;!&ndash;<odoo>&ndash;&gt;-->
+        <!--&lt;!&ndash;    <data>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;        &lt;!&ndash;         Wizard Form &ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;        <record id="view_handoff_wizard_form" model="ir.ui.view">&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="name">handoff.wizard.form</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="model">handoff.wizard</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="arch" type="xml">&ndash;&gt;-->
+        <!--&lt;!&ndash;                <form string="Create Handoff">&ndash;&gt;-->
+        <!--&lt;!&ndash;                    <sheet>&ndash;&gt;-->
+        <!--&lt;!&ndash;                        <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="picking_id" widget="many2many_tags" options="{'no_create': True}"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="name" readonly="1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                &lt;!&ndash;                                <field name="state"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;                            </group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="vehicle_number" invisible="internal != 1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="driver_id" invisible="internal != 1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                <field name="vehicle_id" invisible="internal != 1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                &lt;!&ndash;                                <field name="courier_partner_id"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;                                &lt;!&ndash;                                <field name="manifest_ref"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;                            </group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                        </group>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;                        <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="parcel_count"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="assigned_datetime" invisible="internal != 1"/>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;                            <field name="picked_datetime"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            &lt;!&ndash;                         <field name="delivered_datetime"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="awb_number"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="serviced_by_id" readonly="1"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="authorized_person"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                        </group>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;                        <group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <field name="notes" colspan="2"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                        </group>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;                        <footer>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <button string="Confirm"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    type="object"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    name="action_confirm_handoff"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    class="btn-primary"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;                            <button string="Cancel"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    class="btn-secondary"&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    special="cancel"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;                            <button string="Print"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;                                    type="object"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;                                    name="action_print_handoff_wizard"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;                                    icon="fa-print"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;                                    class="btn-secondary"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;                        </footer>&ndash;&gt;-->
+        <!--&lt;!&ndash;                    </sheet>&ndash;&gt;-->
+        <!--&lt;!&ndash;                </form>&ndash;&gt;-->
+        <!--&lt;!&ndash;            </field>&ndash;&gt;-->
+        <!--&lt;!&ndash;        </record>&ndash;&gt;-->
+
+
+        <!--&lt;!&ndash;        &lt;!&ndash; Act Window &ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;        <record id="action_handoff_wizard" model="ir.actions.act_window">&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="name">Create Handoff</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="res_model">handoff.wizard</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="view_mode">form</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="view_id" ref="view_handoff_wizard_form"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="target">new</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;        </record>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;        &ndash;&gt;-->
+
+        <!--&lt;!&ndash;        <record id="action_delivery_create_handoff" model="ir.actions.server">&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="name">Create Handoff</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="binding_model_id" ref="stock.model_stock_picking"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="binding_view_types">form,list</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="state">code</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;            <field name="code"><![CDATA[&ndash;&gt;-->
+        <!--&lt;!&ndash;active_ids = env.context.get('active_ids') or []&ndash;&gt;-->
+        <!--&lt;!&ndash;active_id = env.context.get('active_id') or (active_ids[0] if active_ids else False)&ndash;&gt;-->
+
+        <!--&lt;!&ndash;action = {&ndash;&gt;-->
+        <!--&lt;!&ndash;    'type': 'ir.actions.act_window',&ndash;&gt;-->
+        <!--&lt;!&ndash;    'name': 'Create Handoff',&ndash;&gt;-->
+        <!--&lt;!&ndash;    'res_model': 'handoff.wizard',&ndash;&gt;-->
+        <!--&lt;!&ndash;    'view_mode': 'form',&ndash;&gt;-->
+        <!--&lt;!&ndash;    'target': 'new',&ndash;&gt;-->
+        <!--&lt;!&ndash;    'context': {&ndash;&gt;-->
+        <!--&lt;!&ndash;        'default_picking_id': active_id,&ndash;&gt;-->
+        <!--&lt;!&ndash;        'active_ids': active_ids,&ndash;&gt;-->
+        <!--&lt;!&ndash;        'active_id': active_id,&ndash;&gt;-->
+        <!--&lt;!&ndash;    },&ndash;&gt;-->
+        <!--&lt;!&ndash;}&ndash;&gt;-->
+        <!--&lt;!&ndash;    ]]></field>&ndash;&gt;-->
+        <!--&lt;!&ndash;        </record>&ndash;&gt;-->
+
+
+        <!--&lt;!&ndash;    </data>&ndash;&gt;-->
+        <!--&lt;!&ndash;</odoo>&ndash;&gt;-->

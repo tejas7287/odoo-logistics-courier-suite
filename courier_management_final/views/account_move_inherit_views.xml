@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_codeware_payments" model="ir.ui.view">
+        <field name="name">account.move.form.codeware.payments</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Insert inside existing smart button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+
+                <button type="object"
+                        name="action_open_payments"
+                        class="oe_stat_button"
+                         invisible="state != 'posted'"
+                        icon="fa-credit-card">
+                    <field name="payment_count" widget="statinfo" string="Payments"/>
+                </button>
+
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

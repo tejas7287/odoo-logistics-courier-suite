@@ -1,0 +1,1281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =====================================================
+     PORTAL HOME CARD
+    ====================================================== -->
+    <template id="portal_my_home_inherit_vendor"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[@id='portal_common_category']" position="after">
+            <!-- SHOW ONLY WHEN portal_location_id IS EMPTY -->
+            <t t-if="not request.env.user.partner_id.portal_location_id">
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/icon.svg'"/>
+
+                        <t t-set="title">
+                            <t t-if="request.env.user.vendor_portal is True">
+                                Vendor Dispatch Details
+                            </t>
+                            <t t-else="">
+                                Tracking Details
+                            </t>
+                        </t>
+
+                        <t t-set="text">Fill or view dispatch details</t>
+                        <t t-set="url" t-value="'/my/vendor_orders'"/>
+                        <t t-set="config_card" t-value="True"/>
+                    </t>
+
+                </div>
+
+            </t>
+        </xpath>
+
+    </template>
+
+    <!-- =====================================================
+     LIST PAGE
+    ====================================================== -->
+    <template id="portal_vendor_dispatch_list">
+        <t t-call="portal.portal_layout">
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">
+                    <t t-if="request.env.user.vendor_portal is True">
+                        Vendor Dispatch Details
+                    </t>
+                    <t t-else="">
+                        Tracking Details
+                    </t>
+                </t>
+            </t>
+
+            <t t-if="request.params.get('success') == '1'">
+                <div class="alert alert-success">
+                    Dispatch details submitted successfully
+                </div>
+            </t>
+
+
+            <!--            try and see-->
+
+
+            <t t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Delivery</th>
+                        <th>Customer</th>
+                        <th>Dispatch Date</th>
+                        <th>Tracking No</th>
+                        <th>Status</th>
+                        <th class="text-end"/>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <t t-foreach="pickings" t-as="picking">
+                        <tr>
+                            <td>
+                                <t t-esc="picking.name"/>
+                            </td>
+                            <td>
+                                <t t-esc="picking.vendor_sale_order_id.partner_id.name or '-'"/>
+                            </td>
+                            <td>
+                                <t t-esc="picking.vendor_dispatch_date or '-'"/>
+                            </td>
+                            <td>
+                                <t t-esc="picking.vendor_tracking_number or '-'"/>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    <t t-esc="picking.vendor_delivery_status or 'Pending'"/>
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-primary btn-sm"
+                                   t-att-href="'/my/vendor_dispatch/%s' % picking.id">
+                                    Open
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+
+            </t>
+
+        </t>
+    </template>
+
+    <!-- =====================================================
+     DETAIL PAGE
+    ====================================================== -->
+    <template id="vendor_dispatch_detail_page"
+              inherit_id="portal.portal_sidebar"
+              primary="True">
+
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+
+            <!-- SIDEBAR -->
+            <t t-call="portal.portal_record_sidebar">
+                <t t-set="title">
+                    <h2 class="mb-0">
+                        <t t-if="request.env.user.vendor_portal is True">
+                            Vendor Dispatch Details
+                        </t>
+                        <t t-else="">
+                            Tracking Details
+                        </t>
+                        :
+                        <t t-esc="picking.name"/>
+                    </h2>
+                </t>
+            </t>
+
+            <!-- CONTENT -->
+            <div class="o_portal_content col-12 col-lg-8">
+
+                <!-- ================= CUSTOMER ================= -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <strong>Customer Details</strong>
+                    </div>
+                    <div class="card-body">
+                        <t t-set="cust"
+                           t-value="picking.vendor_sale_order_id.partner_shipping_id
+                                    or picking.vendor_sale_order_id.partner_id"/>
+                        <strong>
+                            <t t-esc="cust.name"/>
+                        </strong>
+                        <br/>
+                        <small class="text-muted">
+                            <t t-esc="cust.contact_address"/>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- ================= PRODUCTS ================= -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <strong>Product Details</strong>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Qty</th>
+                                    <th>UoM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="picking.move_ids" t-as="move">
+                                    <tr>
+                                        <td>
+                                            <t t-esc="move.product_id.display_name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="move.product_uom_qty"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="move.product_uom.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- =================================================
+                     EDITABLE — ONLY VENDOR + ONLY BEFORE SUBMIT
+                ================================================== -->
+                <t t-if="request.env.user.vendor_portal is True
+                         and (not picking.vendor_delivery_status
+                              or picking.vendor_delivery_status == 'pending')">
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <strong>Dispatch Details</strong>
+                        </div>
+
+                        <div class="card-body">
+                            <!--                            <form t-att-action="'/my/vendor_orders/submit/%s' % picking.id"-->
+                            <!--                                  method="post">-->
+                            <form t-att-action="'/my/vendor_orders/submit/' + str(picking.id)" method="post">
+
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+
+                                <input type="hidden"
+                                       name="vendor_delivery_status"
+                                       value="transit"/>
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dispatch Reference</label>
+                                        <input class="form-control"
+                                               name="vendor_dispatch_reference"
+                                               required="required"
+                                               t-att-value="picking.vendor_dispatch_reference or ''"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            <b>Purchase Order</b>
+                                        </label>
+                                        <input class="form-control"
+                                               type="text"
+                                               readonly="readonly"
+                                               t-att-value="picking.vendor_purchase_order_id.name
+                        if picking.vendor_purchase_order_id else 'N/A'"/>
+
+
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dispatch Date</label>
+                                        <input type="datetime-local"
+                                               class="form-control"
+                                               name="vendor_dispatch_date"
+                                               required="required"
+                                               t-att-value="picking.vendor_dispatch_date
+                               and picking.vendor_dispatch_date.strftime('%Y-%m-%dT%H:%M') or ''"/>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tracking Number</label>
+                                        <input class="form-control"
+                                               name="vendor_tracking_number"
+                                               required="required"
+                                               t-att-value="picking.vendor_tracking_number or ''"/>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Vendor Invoice Number</label>
+                                        <input class="form-control"
+                                               name="vendor_invoice_number"
+                                               required="required"
+                                               t-att-value="picking.vendor_invoice_number or ''"/>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Expected Delivery Date</label>
+                                        <input type="date"
+                                               class="form-control"
+                                               name="vendor_expected_delivery_date"
+                                               required="required"
+                                               t-att-value="picking.vendor_expected_delivery_date or ''"/>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dispatch Location</label>
+                                        <select class="form-select"
+                                                name="vendor_dispatch_location_id"
+                                                required="required">
+                                            <t t-foreach="request.env['stock.location'].sudo().search([])" t-as="loc">
+                                                <option t-att-value="loc.id"
+                                                        t-att-selected="picking.vendor_dispatch_location_id.id == loc.id">
+                                                    <t t-esc="loc.complete_name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Assigned Carrier</label>
+                                        <select class="form-select"
+                                                name="vendor_carrier_id"
+                                                required="required">
+                                            <t t-foreach="request.env['delivery.carrier'].sudo().search([])"
+                                               t-as="carrier">
+                                                <option t-att-value="carrier.id"
+                                                        t-att-selected="picking.vendor_carrier_id.id == carrier.id">
+                                                    <t t-esc="carrier.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payment Status</label>
+                                        <select class="form-select"
+                                                name="vendor_payment_status"
+                                                required="required">
+                                            <option value="draft">Draft</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="done">Done</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Notes</label>
+                                        <textarea class="form-control"
+                                                  rows="3"
+                                                  name="vendor_notes"
+                                                  required="required">
+                                            <t t-esc="picking.vendor_notes or ''"/>
+                                        </textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end mt-4">
+                                    <button type="submit"
+                                            class="btn btn-primary px-4">
+                                        Submit Dispatch
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                </t>
+
+                <!-- =================================================
+                     READ ONLY — ADMIN + ALL OTHER USERS
+                ================================================== -->
+                <t t-else="">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <strong>Dispatch Details</strong>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <b>Dispatch Reference</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_dispatch_reference or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Dispatch Date</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_dispatch_date or 'N/A'"/>
+                                </div>
+
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <b>Purchase Order</b>-->
+                                <!--                                    <br/>-->
+                                <!--                                    <t t-esc="picking.vendor_purchase_order_id.name-->
+                                <!--                                              if picking.vendor_purchase_order_id else 'N/A'"/>-->
+                                <!--                                </div>-->
+                                <div class="col-md-6">
+                                    <b>Sale Order</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_sale_order_id.name
+                        if picking.vendor_sale_order_id else 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Tracking Number</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_tracking_number or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Vendor Invoice</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_invoice_number or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Expected Delivery</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_expected_delivery_date or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Dispatch Location</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_dispatch_location_id.complete_name or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Assigned Carrier</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_carrier_id.name or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Payment Status</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_payment_status or 'N/A'"/>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <b>Delivery Status</b>
+                                    <br/>
+                                    <t t-esc="picking.vendor_delivery_status or 'N/A'"/>
+                                </div>
+
+                                <div class="col-12">
+                                    <b>Notes</b>
+                                    <div class="border rounded p-2 bg-light mt-1">
+                                        <t t-esc="picking.vendor_notes or 'N/A'"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+            </div>
+        </xpath>
+
+    </template>
+
+    <!--DELIVERIES AKNOWLEDGEMENT-->
+
+    <template id="portal_my_home_acknowledge_inherit"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[contains(@class,'o_portal_category')][last()]" position="after">
+
+            <!-- SHOW ONLY WHEN portal_location_id IS FILLED -->
+            <t t-if="request.env.user.partner_id.portal_location_id">
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/Delivery_icon.svg'"/>
+                        <t t-set="title">Delivery Receipts</t>
+                        <t t-set="text">Acknowledge received deliveries</t>
+                        <t t-set="url"
+                           t-value="'/my/vendor_acknowledgements?mode=ack'"/>
+                        <t t-set="config_card" t-value="True"/>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+
+    </template>
+
+
+    <!-- =====================================================
+     ACKNOWLEDGEMENT FORM VIEW
+    ====================================================== -->
+    <template id="portal_vendor_acknowledgement_form">
+        <t t-call="portal.portal_layout">
+
+            <div class="container mt-4">
+                <h3>
+                    Delivery :
+                    <t t-esc="picking.name"/>
+                </h3>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+
+                        <p>
+                            <b>Source Location:</b>
+                            <t t-esc="picking.location_id.complete_name"/>
+                        </p>
+
+                        <p>
+                            <b>Destination Location:</b>
+                            <t t-esc="picking.location_dest_id.complete_name"/>
+                        </p>
+
+                        <form t-att-action="'/my/vendor_acknowledgements/ack/%s' % picking.id"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Acknowledge Receipt
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+        </t>
+    </template>
+
+    <!--    <template id="portal_vendor_acknowledgement_list">-->
+    <!--        <t t-call="portal.portal_layout">-->
+
+
+    <!--             <div class="container mt-3">-->
+    <!--            &lt;!&ndash; ✅ SUCCESS MESSAGE &ndash;&gt;-->
+    <!--            <t t-if="request.params.get('success') == '1'">-->
+    <!--                <div class="alert alert-success">-->
+    <!--                    Deliveries validated successfully.-->
+    <!--                </div>-->
+    <!--            </t>-->
+    <!--            <t t-if="request.params.get('msg') == 'no_selection'">-->
+    <!--                <div class="alert alert-danger">-->
+    <!--                    Please select at least one delivery to validate.-->
+    <!--                </div>-->
+    <!--            </t>-->
+    <!--            <t t-if="request.params.get('msg') == 'no_delete_selection'">-->
+    <!--                <div class="alert alert-danger">-->
+    <!--                    Please select at least one delivery to delete.-->
+    <!--                </div>-->
+    <!--            </t>-->
+
+    <!--            <t t-if="request.params.get('msg') == 'already_done'">-->
+    <!--                <div class="alert alert-warning">-->
+    <!--                    Some selected deliveries are already validated and cannot be deleted.-->
+    <!--                </div>-->
+    <!--            </t>-->
+
+    <!--            <t t-if="request.params.get('success') == 'deleted'">-->
+    <!--                <div class="alert alert-success">-->
+    <!--                    Selected deliveries deleted successfully.-->
+    <!--                </div>-->
+    <!--            </t>-->
+
+
+    <!--            <t t-if="request.params.get('msg') == 'deleted'">-->
+    <!--                <div class="alert alert-success">-->
+    <!--                    Selected deliveries deleted successfully.-->
+    <!--                </div>-->
+    <!--            </t>-->
+
+
+    <!--            <t t-if="request.params.get('msg') == 'already_done'">-->
+    <!--                <div class="alert alert-warning">-->
+    <!--                    Selected deliveries are already validated and cannot be deleted.-->
+    <!--                </div>-->
+    <!--            </t>-->
+    <!--            </div>-->
+
+    <!--            <t t-call="portal.portal_searchbar">-->
+    <!--                <t t-set="title">Delivery Acknowledgements</t>-->
+    <!--            </t>-->
+
+
+    <!--            &lt;!&ndash; 🔍 TRACKING SEARCH BAR &ndash;&gt;-->
+    <!--            <form method="get" class="mb-3">-->
+
+    <!--                <div class="row g-2 align-items-end">-->
+
+    <!--                    <div class="col-md-4">-->
+    <!--                        <label class="form-label">-->
+    <!--                            <b>Search Tracking Number</b>-->
+    <!--                        </label>-->
+    <!--                        <input type="text"-->
+    <!--                               name="tracking"-->
+    <!--                               class="form-control"-->
+    <!--                               placeholder="Scan or enter Tracking Number"-->
+    <!--                               t-att-value="tracking_search or ''"-->
+    <!--                               autofocus="autofocus"/>-->
+    <!--                    </div>-->
+
+    <!--                    <div class="col-md-2">-->
+    <!--                        <button type="submit" class="btn btn-primary w-100">-->
+    <!--                            Search-->
+    <!--                        </button>-->
+    <!--                    </div>-->
+
+    <!--                    <div class="col-md-2">-->
+    <!--                        <a href="/my/vendor_acknowledgements"-->
+    <!--                           class="btn btn-secondary w-100">-->
+    <!--                            Clear-->
+    <!--                        </a>-->
+    <!--                    </div>-->
+
+    <!--                </div>-->
+
+    <!--            </form>-->
+
+
+    <!--            <form method="post"-->
+    <!--                  t-att-action="'/my/vendor_acknowledgements/process'">-->
+
+    <!--                <input type="hidden"-->
+    <!--                       name="csrf_token"-->
+    <!--                       t-att-value="request.csrf_token()"/>-->
+    <!--                &lt;!&ndash; OPERATION + VALIDATE &ndash;&gt;-->
+    <!--                <t t-if="mode == 'operation'">-->
+    <!--                    <div class="card mt-3">-->
+    <!--                        <div class="card-body">-->
+    <!--                            <div class="row g-3 align-items-end">-->
+
+    <!--                                <div class="col-md-6">-->
+    <!--                                    <label class="form-label">Operation</label>-->
+    <!--                                    <select class="form-select"-->
+    <!--                                            name="picking_type_id"-->
+    <!--                                            required="required">-->
+    <!--                                        <option value="">Select Operation</option>-->
+    <!--                                        <t t-foreach="picking_types" t-as="ptype">-->
+    <!--                                            <option t-att-value="ptype.id">-->
+    <!--                                                <t t-esc="ptype.name"/>-->
+    <!--                                            </option>-->
+    <!--                                        </t>-->
+    <!--                                    </select>-->
+    <!--                                </div>-->
+
+    <!--                                <div class="col-md-6 text-end">-->
+    <!--                                    <button type="submit"-->
+    <!--                                            class="btn btn-success px-4">-->
+    <!--                                        Validate-->
+    <!--                                    </button>-->
+    <!--                                </div>-->
+
+    <!--                            </div>-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </t>-->
+    <!--                <div class="mb-3"></div>-->
+    <!--                &lt;!&ndash;                <div class="alert alert-info">&ndash;&gt;-->
+    <!--                &lt;!&ndash;                    <b>Total Acknowledged Deliveries:</b>&ndash;&gt;-->
+    <!--                &lt;!&ndash;                    <t t-esc="request.env.user.partner_id.vendor_ack_count"/>&ndash;&gt;-->
+    <!--                &lt;!&ndash;                </div>&ndash;&gt;-->
+
+
+    <!--                <t t-call="portal.portal_table">-->
+    <!--                    <thead>-->
+    <!--                        <tr>-->
+    <!--                            &lt;!&ndash; SELECT ALL &ndash;&gt;-->
+    <!--                            <th>-->
+    <!--                                <input type="checkbox"-->
+    <!--                                       onclick="-->
+    <!--                                   const cbs = document.querySelectorAll('input[name=picking_ids]');-->
+    <!--                                   cbs.forEach(cb => { if (!cb.disabled) cb.checked = this.checked; });-->
+    <!--                                   "/>-->
+    <!--                            </th>-->
+    <!--                            <th>Delivery</th>-->
+    <!--                            <th>Tracking No</th>-->
+    <!--                            <th>Source</th>-->
+    <!--                            <th>Portal Status</th>-->
+    <!--                            <th>Acknowledged</th>-->
+    <!--                            <th class="text-end">Open</th>-->
+    <!--                        </tr>-->
+    <!--                    </thead>-->
+
+    <!--                    <tbody>-->
+    <!--                        <t t-foreach="pickings" t-as="picking">-->
+    <!--                            <tr>-->
+    <!--                                <td>-->
+    <!--                                    <input type="checkbox"-->
+    <!--                                           name="picking_ids[]"-->
+    <!--                                           t-att-value="picking.id"-->
+    <!--                                           t-att-disabled="picking.vendor_portal_state == 'done'"/>-->
+    <!--                                </td>-->
+
+    <!--                                <td>-->
+    <!--                                    <t t-esc="picking.name"/>-->
+    <!--                                </td>-->
+    <!--                                <td>-->
+    <!--                                    <t t-if="picking.tracking_number">-->
+    <!--                                        <t t-esc="picking.tracking_number"/>-->
+    <!--                                    </t>-->
+    <!--                                    <t t-else="">-</t>-->
+    <!--                                </td>-->
+
+
+    <!--                                <td>-->
+    <!--                                    <t t-esc="picking.location_id.complete_name"/>-->
+    <!--                                </td>-->
+
+    <!--                                <td>-->
+    <!--                                    <span t-att-class="-->
+    <!--                                    'badge ' + (-->
+    <!--                                        'bg-warning' if picking.vendor_portal_state == 'draft'-->
+    <!--                                        else 'bg-success'-->
+    <!--                                    )-->
+    <!--                                ">-->
+    <!--                                        <t t-esc="picking.vendor_portal_state"/>-->
+    <!--                                    </span>-->
+    <!--                                </td>-->
+    <!--                                <td>-->
+    <!--                                    <t t-if="not picking.portal_acknowledged">-->
+    <!--                                        <form t-att-action="'/my/vendor_acknowledgements/ack/%s' % picking.id"-->
+    <!--                                              method="post">-->
+
+    <!--                                            <input type="hidden"-->
+    <!--                                                   name="csrf_token"-->
+    <!--                                                   t-att-value="request.csrf_token()"/>-->
+
+    <!--                                            <button type="submit"-->
+    <!--                                                    class="btn btn-success btn-sm">-->
+    <!--                                                Acknowledge Receipt-->
+    <!--                                            </button>-->
+
+    <!--                                        </form>-->
+    <!--                                    </t>-->
+
+    <!--                                    <t t-else="">-->
+    <!--                                        <span class="text-success fw-bold">-->
+    <!--                                            Acknowledged-->
+    <!--                                        </span>-->
+    <!--                                    </t>-->
+    <!--                                </td>-->
+
+
+    <!--                                <td class="text-end">-->
+    <!--                                    <a class="btn btn-primary btn-sm"-->
+    <!--                                       t-att-href="'/my/vendor_acknowledgements/%s' % picking.id">-->
+    <!--                                        Open-->
+    <!--                                    </a>-->
+    <!--                                </td>-->
+    <!--                            </tr>-->
+    <!--                        </t>-->
+    <!--                    </tbody>-->
+    <!--                </t>-->
+
+
+    <!--            </form>-->
+    <!--            <form method="post"-->
+    <!--                  t-att-action="'/my/vendor_acknowledgements/delete'"-->
+    <!--                  class="mt-3">-->
+
+    <!--                <input type="hidden"-->
+    <!--                       name="csrf_token"-->
+    <!--                       t-att-value="request.csrf_token()"/>-->
+
+    <!--                &lt;!&ndash; reuse same selected checkboxes &ndash;&gt;-->
+    <!--                <t t-foreach="pickings" t-as="picking">-->
+    <!--                    <input type="hidden"-->
+    <!--                           name="picking_ids"-->
+    <!--                           t-att-value="picking.id"-->
+    <!--                           t-if="picking.vendor_portal_state != 'done'"/>-->
+    <!--                </t>-->
+
+    <!--                <button type="submit"-->
+    <!--                        class="btn btn-danger"-->
+    <!--                        onclick="return confirm('Are you sure you want to delete selected deliveries?');">-->
+    <!--                    Delete-->
+    <!--                </button>-->
+    <!--            </form>-->
+
+    <!--        </t>-->
+
+    <!--    </template>-->
+    <template id="portal_vendor_acknowledgement_list">
+        <t t-call="portal.portal_layout">
+
+            <!-- ===== TITLE ===== -->
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Delivery Acknowledgements</t>
+            </t>
+
+            <!-- ===== BANNERS ===== -->
+            <div class="container mt-2 mb-3">
+                <t t-if="request.params.get('success') == '1'">
+                    <div class="alert alert-success">Deliveries validated successfully.</div>
+                </t>
+                <t t-if="request.params.get('msg') == 'no_selection'">
+                    <div class="alert alert-danger">Please select at least one delivery.</div>
+                </t>
+                <t t-if="request.params.get('msg') == 'already_done'">
+                    <div class="alert alert-warning">Some selected deliveries are already validated.</div>
+                </t>
+            </div>
+
+            <!-- ===== SEARCH ===== -->
+            <div class="container">
+                <form method="get" class="mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" name="tracking"
+                                   class="form-control"
+                                   placeholder="Enter Tracking Number"
+                                   t-att-value="tracking_search or ''"/>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100">Search</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="/my/vendor_acknowledgements" class="btn btn-secondary w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===== OPERATION + VALIDATE (INDEPENDENT) ===== -->
+            <div class="container">
+                <t t-if="request.params.get('mode') == 'operation'">
+
+                    <form method="post" t-att-action="'/my/vendor_acknowledgements/process'">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <div class="card mt-3 mb-3">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Operation</label>
+                                        <select class="form-select" name="picking_type_id">
+                                            <option value="">Select Operation</option>
+                                            <t t-foreach="picking_types" t-as="ptype">
+                                                <option t-att-value="ptype.id">
+                                                    <t t-esc="ptype.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <button type="submit" class="btn btn-success px-4">
+                                            Validate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- hidden checkboxes copied via JS -->
+                        <div id="selected_pickings_container"></div>
+                    </form>
+                </t>
+            </div>
+
+            <!-- ===== DELIVERY TABLE (INDEPENDENT) ===== -->
+            <div class="container">
+                <t t-call="portal.portal_table">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" onclick="
+                                const cbs = document.querySelectorAll('.pick_cb');
+                                cbs.forEach(cb => {
+    cb.checked = this.checked;
+    cb.dispatchEvent(new Event('change'));
+});
+                            "/>
+                            </th>
+                            <th>Delivery</th>
+                            <th>Tracking</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Acknowledged</th>
+                            <th class="text-end">Open</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <t t-foreach="pickings" t-as="picking">
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                           class="pick_cb"
+                                           t-att-value="picking.id"
+                                           t-att-disabled="picking.vendor_portal_state == 'done'"
+                                           onchange="
+                                       const box = this;
+                                       const cont = document.getElementById('selected_pickings_container');
+                                       if (box.checked) {
+                                           const i = document.createElement('input');
+                                           i.type = 'hidden';
+                                           i.name = 'picking_ids[]';
+                                           i.value = box.value;
+                                           i.id = 'hid_' + box.value;
+                                           cont.appendChild(i);
+                                       } else {
+                                           const i = document.getElementById('hid_' + box.value);
+                                           if (i) i.remove();
+                                       }
+                                       "/>
+                                </td>
+
+                                <td>
+                                    <t t-esc="picking.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="picking.tracking_number or '-'"/>
+                                </td>
+                                <td>
+                                    <t t-esc="picking.location_id.complete_name"/>
+                                </td>
+
+                                <td>
+                                    <span t-att-class="'badge ' + ('bg-warning' if picking.vendor_portal_state == 'draft' else 'bg-success')">
+                                        <t t-esc="picking.vendor_portal_state"/>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <t t-if="not picking.portal_acknowledged">
+                                        <form t-att-action="'/my/vendor_acknowledgements/ack/%s' % picking.id"
+                                              method="post">
+                                            <input type="hidden" name="csrf_token"
+                                                   t-att-value="request.csrf_token()"/>
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                Acknowledge Receipt
+                                            </button>
+                                        </form>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-success fw-bold">Acknowledged</span>
+                                    </t>
+                                </td>
+
+                                <td class="text-end">
+                                    <a t-att-href="'/my/vendor_acknowledgements/%s' % picking.id"
+                                       class="btn btn-primary btn-sm">Open
+                                    </a>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+
+                </t>
+            </div>
+
+        </t>
+    </template>
+
+
+    <!-- =====================================================
+    OPERATIONS CARD (SAME CONTROLLER)
+    ====================================================== -->
+    <template id="portal_my_home_operations_inherit"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[contains(@class,'o_portal_category')][last()]" position="after">
+            <!-- SHOW ONLY WHEN portal_location_id IS FILLED -->
+            <t t-if="request.env.user.partner_id.portal_location_id">
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/Delivery_icon.svg'"/>
+                        <t t-set="title">Operations</t>
+                        <t t-set="text">Transfer Your Stocks From Here</t>
+
+                        <!-- 🔥 SAME URL, SAME CONTROLLER -->
+                        <t t-set="url"
+                           t-value="'/my/vendor_acknowledgements?mode=operation'"/>
+
+
+                        <t t-set="config_card" t-value="True"/>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+
+    </template>
+
+    <!--customer Template -->
+
+    <template id="portal_my_home_customer_tracking"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[@id='portal_common_category']" position="after">
+
+            <!-- END CUSTOMER ONLY -->
+            <t t-if="not request.env.user.partner_id.portal_location_id">
+
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/Delivery_icon.svg'"/>
+
+                        <t t-set="title">Track My Order</t>
+
+                        <t t-set="text">
+                            View current status
+                        </t>
+
+                        <t t-set="url" t-value="'/my/trackings'"/>
+
+                        <!-- REQUIRED -->
+                        <t t-set="count" t-value="0"/>
+                        <t t-set="config_card" t-value="True"/>
+
+                    </t>
+                </div>
+
+            </t>
+
+        </xpath>
+    </template>
+
+    <template id="portal_customer_tracking_list">
+        <t t-call="portal.portal_layout">
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Orders Tracking</t>
+            </t>
+
+
+            <t t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Sale Order</th>
+                        <th>Status</th>
+                        <th class="text-end"/>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <t t-foreach="pickings" t-as="picking">
+                        <tr>
+                            <td>
+                                <t t-esc="picking.customer_sale_order"/>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    <t t-esc="picking.customer_tracking_status"/>
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                <a class="btn btn-primary btn-sm"
+                                   t-att-href="'/my/trackings/%s' % picking.id">
+                                    Open
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+
+        </t>
+    </template>
+
+    <!--customer Template -->
+
+    <template id="portal_my_home_customer_tracking"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[contains(@class,'o_portal_category')][last()]" position="after">
+
+            <!-- SHOW ONLY WHEN portal_location_id IS NOT FILLED (CUSTOMER) -->
+            <t t-if="not request.env.user.partner_id.portal_location_id">
+
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/Delivery_icon.svg'"/>
+
+                        <t t-set="title">Track My Order</t>
+
+                        <t t-set="text">
+                            View current status
+                        </t>
+
+                        <t t-set="url"
+                           t-value="'/my/trackings'"/>
+
+                        <t t-set="config_card" t-value="True"/>
+
+                    </t>
+                </div>
+
+            </t>
+
+        </xpath>
+    </template>
+
+    <template id="portal_customer_tracking_list">
+        <t t-call="portal.portal_layout">
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Orders Tracking</t>
+            </t>
+
+            <t t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Sale Order</th>
+                        <th>Status</th>
+                        <th class="text-end"/>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <t t-foreach="pickings" t-as="picking">
+                        <tr>
+                            <td>
+                                <t t-esc="picking.customer_sale_order"/>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    <t t-esc="picking.customer_tracking_status"/>
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+                                <a class="btn btn-primary btn-sm"
+                                   t-att-href="'/my/trackings/%s' % picking.id">
+                                    Open
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+
+        </t>
+    </template>
+
+
+    <template id="portal_customer_tracking_form">
+        <t t-call="portal.portal_layout">
+
+            <div class="container mt-4">
+                <h3>📦 Order Tracking</h3>
+
+                <div class="o_customer_tracking_box">
+
+
+                    <p>
+                        <b>Sale Order:</b>
+                        <t t-esc="picking.customer_sale_order"/>
+                    </p>
+
+
+                    <div class="o_tracking_vertical">
+
+                        <div class="o_tracking_step active">
+                            <div class="o_tracking_circle"/>
+                            <div class="o_tracking_label">
+                                Ordered
+                                <div class="text-muted small">
+                                    Ordered on:
+                                    <t t-esc="
+                picking.customer_ordered_on
+                and picking.customer_ordered_on.strftime('%d %b %Y, %I:%M %p')
+                or '-'
+            "/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="o_tracking_step"
+                             t-att-class="
+        picking.customer_tracking_status in ['In Transit','Delivered']
+        and 'o_tracking_step active' or 'o_tracking_step'
+     ">
+                            <div class="o_tracking_circle"/>
+                            <div class="o_tracking_label">In Transit</div>
+                        </div>
+
+                        <div class="o_tracking_step"
+                             t-att-class="
+        picking.customer_tracking_status == 'Delivered'
+        and 'o_tracking_step active' or 'o_tracking_step'
+     ">
+                            <div class="o_tracking_circle"/>
+                            <div class="o_tracking_label">
+                                Delivered
+                                <div class="text-muted small">
+                                    Expected delivery:
+                                    <t t-esc="
+                picking.customer_expected_on
+                and picking.customer_expected_on.strftime('%d %b %Y')
+                or '-'
+            "/>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <hr/>
+
+                </div>
+            </div>
+
+        </t>
+    </template>
+
+
+    <!--    STOCK COUNT-->
+    <template id="portal_my_home_stock_inherit"
+              inherit_id="portal.portal_my_home">
+
+        <xpath expr="//div[contains(@class,'o_portal_category')][last()]" position="after">
+
+            <!-- SHOW ONLY WHEN portal_location_id IS FILLED -->
+            <t t-if="request.env.user.partner_id.portal_location_id">
+                <div class="o_portal_category row g-2 mt-3">
+                    <t t-call="portal.portal_docs_entry">
+
+                        <t t-set="icon"
+                           t-value="'/vendor_dispatch_portal_v2/static/src/Delivery_icon.svg'"/>
+
+                        <t t-set="title">Stock Available</t>
+                        <t t-set="text">Check the Stock Quantity Here</t>
+
+                        <t t-set="url"
+                           t-value="'/my/stock/cards'"/>
+
+                        <t t-set="config_card" t-value="True"/>
+
+                    </t>
+                </div>
+            </t>
+
+        </xpath>
+
+    </template>
+    <template id="portal_stock_card_page">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Stock</t>
+            <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <strong>Total Delivery Orders Available</strong>
+                <span class="badge bg-primary fs-5">
+                    <t t-esc="total_orders"/>
+                </span>
+            </div>
+
+            <div class="container mt-4">
+
+                <t t-if="pickings">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Delivery Order</th>
+                                <th>Scheduled Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="pickings" t-as="picking">
+                                <tr>
+                                    <td>
+                                        <t t-esc="picking.name"/>
+                                    </td>
+
+                                    <td>
+                                        <t t-esc="picking.scheduled_date"/>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            <t t-esc="picking.state"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+
+                <t t-if="not pickings">
+                    <div class="alert alert-info text-center">
+                        No stock available.
+                    </div>
+                </t>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>
+
+
+

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_courier_handoff" t-name="courier_management_final.report_courier_handoff">
+        <t t-call="web.external_layout">
+            <t t-foreach="docs" t-as="doc">
+                <main class="o_report_layout">
+                    <div class="page">
+
+                        <!-- TITLE -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <h2 style="margin:0 0 8px 0;">
+                                Handoff Reference -
+                                <t t-esc="doc.name"/>
+                            </h2>
+                        </div>
+
+                        <!-- TWO COLUMNS LIKE WIZARD -->
+                        <table style="width:100%; margin-bottom: 12px;">
+                            <tr>
+                                <td style="width:50%; vertical-align:top; padding-right:12px;">
+                                    <t t-if="doc.internal == 1">
+                                        <div>
+                                            <strong>Driver:</strong>
+                                            <t t-esc="doc.driver_id.name or ''"/>
+                                        </div>
+                                        <div>
+                                            <strong>Vehicle:</strong>
+                                            <t t-esc="doc.vehicle_id.name or ''"/>
+                                        </div>
+                                        <div>
+                                            <strong>Vehicle Number:</strong>
+                                            <t t-esc="doc.vehicle_number or ''"/>
+                                        </div>
+                                    </t>
+
+                                    <div>
+                                        <strong>Courier Partner:</strong>
+                                        <t t-esc="doc.courier_partner_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Manifest Ref:</strong>
+                                        <t t-esc="doc.manifest_ref or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Parcel Count:</strong>
+                                        <t t-esc="doc.parcel_count or 0"/>
+                                    </div>
+                                    <div>
+                                        <strong>Authorized Person:</strong>
+                                        <t t-esc="doc.authorized_person or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Courier Partner:</strong>
+                                        <t t-esc="doc.courier_partner_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Manifest Ref:</strong>
+                                        <t t-esc="doc.manifest_ref or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Parcel Count:</strong>
+                                        <t t-esc="doc.parcel_count or 0"/>
+                                    </div>
+                                    <!-- NEW FIELDS -->
+                                    <div>
+                                        <strong>Authorized Person:</strong>
+                                        <t t-esc="doc.authorized_person or ''"/>
+                                    </div>
+
+                                </td>
+
+                                <td style="width:50%; vertical-align:top; padding-left:12px;">
+                                    <div>
+                                        <strong>Assigned On:</strong>
+                                        <t t-esc="doc.assigned_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Picked On:</strong>
+                                        <t t-esc="doc.picked_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Delivered On:</strong>
+                                        <t t-esc="doc.delivered_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Status:</strong>
+                                        <t t-esc="doc.state or ''"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <hr style="border:none; border-top:1px solid #bbb; margin:12px 0;"/>
+
+                        <!-- PICKINGS TABLE -->
+                        <h4 style="margin:8px 0;">Pickings</h4>
+
+                        <table class="table table-sm"
+                               style="width:100%; border-collapse: collapse; margin-bottom:12px;">
+                            <thead>
+                                <tr style="background:#f5f5f5;">
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Picking</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Sale Order</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Delivery Address</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">ZipCode</th>
+                                    <t t-if="doc.internal != 1">
+                                        <th style="padding:6px 8px; border:1px solid #e0e0e0;">AWB Number</th>
+                                        <th style="padding:6px 8px; border:1px solid #e0e0e0;">Barcode</th>
+                                    </t>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <t t-foreach="doc.picking_id" t-as="pi">
+                                    <tr>
+                                        <!-- PICKING -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.name"/>
+                                        </td>
+
+                                        <!-- SALE ORDER -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.sale_id.name if pi.sale_id else ''"/>
+                                        </td>
+
+                                        <!-- DELIVERY ADDRESS EXACTLY LIKE WIZARD -->
+                                        <td style="padding:6px 8px; border:1px solid #eee; line-height:14px;">
+                                            <strong>
+                                                <t t-esc="pi.receiver_name or ''"/>
+                                            </strong>
+                                            <br/>
+                                            <t t-esc="pi.receiver_address or ''"/>
+                                            <br/>
+                                            Phone:
+                                            <t t-esc="pi.receiver_phone or ''"/>
+                                            <br/>
+                                            ZIP:
+                                            <t t-esc="pi.receiver_zip or ''"/>
+                                        </td>
+
+                                        <!-- ZIP COLUMN -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.receiver_zip or ''"/>
+                                        </td>
+                                        <!--                                        &lt;!&ndash; NEW: AWB NUMBER &ndash;&gt;-->
+                                        <!--                                        <td style="padding:6px 8px; border:1px solid #eee;">-->
+                                        <!--                                            <t t-esc="pi.awb_number or ''"/>-->
+                                        <!--                                        </td>-->
+
+                                        <!--                                        &lt;!&ndash; NEW: BARCODE &ndash;&gt;-->
+                                        <!--                                        <td style="padding:6px 8px; border:1px solid #eee; text-align:center;">-->
+                                        <!--                                            <t t-esc="pi.barcode_number">-->
+
+                                        <!--                                            </t>-->
+                                        <!--                                        </td>-->
+                                        <t t-if="doc.internal != 1">
+                                            <!-- AWB -->
+                                            <td style="padding:6px 8px; border:1px solid #eee;">
+                                                <t t-esc="pi.awb_number or ''"/>
+                                            </td>
+
+                                            <!-- Barcode -->
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:center;">
+                                                <t t-esc="pi.barcode_number or ''"/>
+                                            </td>
+                                        </t>
+
+                                        <t t-else="">
+                                            <!-- Do NOT show AWB & Barcode for internal courier (CServe) -->
+                                        </t>
+
+
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- NOTES -->
+                        <div style="margin-top:20px;">
+                            <strong>Notes:</strong>
+                            <pre style="white-space: pre-wrap; margin:0;">
+                                <t t-esc="doc.notes or ''"/>
+                            </pre>
+                        </div>
+                        <footer>
+                            <div style="margin-top:50px;">
+                                <strong>Driver Name:</strong>
+                            </div>
+                            <div style="margin-top:50px;">
+                                <strong>Driver Signature:</strong>
+                            </div>
+                            <div style="margin-top:50px;">
+                                <strong>Date:</strong>
+                            </div>
+
+                        </footer>
+
+                    </div>
+                </main>
+            </t>
+        </t>
+    </template>
+</odoo>

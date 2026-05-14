@@ -1,0 +1,48 @@
+<odoo>
+    <record id="action_report_handoff_wizard" model="ir.actions.report">
+        <field name="name">Handoff Wizard PDF</field>
+        <field name="model">handoff.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+
+        <!-- TEMPLATE NAME -->
+        <field name="report_name">courier_management_final.report_handoff_wizard</field>
+        <field name="report_file">courier_management_final.report_handoff_wizard</field>
+
+        <!-- MODEL BINDER -->
+        <field name="binding_model_id" ref="model_handoff_wizard"/>
+    </record>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<odoo>-->
+<!--    <record id="action_report_handoff_wizard" model="ir.actions.report">-->
+<!--        <field name="name">Handoff Wizard PDF</field>-->
+<!--        <field name="model">handoff.wizard</field>-->
+<!--        <field name="report_type">qweb-pdf</field>-->
+
+<!--        &lt;!&ndash; TEMPLATE NAME &ndash;&gt;-->
+<!--        <field name="report_name">courier_management_final.report_handoff_wizard</field>-->
+<!--        <field name="report_file">courier_management_final.report_handoff_wizard</field>-->
+
+<!--        &lt;!&ndash; MODEL BINDER &ndash;&gt;-->
+<!--        <field name="binding_model_id" ref="model_handoff_wizard"/>-->
+<!--    </record>-->
+<!--</odoo>-->

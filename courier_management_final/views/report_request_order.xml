@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_report_request_order" model="ir.actions.report">
+    <field name="name">Request Order PDF</field>
+    <field name="model">codeware.request.order</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">courier_management_final.report_request_order</field>
+    <field name="report_file">courier_management_final.report_request_order</field>
+    <field name="binding_model_id" ref="model_codeware_request_order"/>
+  </record>
+
+  <template id="report_request_order" t-name="courier_management_final.report_request_order">
+    <t t-call="web.external_layout">
+      <t t-foreach="docs" t-as="doc">
+        <main role="main" class="o_report_layout">
+          <div class="page">
+            <h2>Request Order - <t t-esc="doc.name"/></h2>
+
+            <!-- Tracking + Barcode -->
+            <t t-if="doc.barcode_image">
+              <div style="margin:12px 0; text-align:left;">
+                <img t-att-src="'data:image/png;base64,%s' % doc.barcode_image.decode()"
+                     style="width:300px; height:90px;"/>
+                <div style="margin-top:6px; font-size:20px; font-weight:700;">
+                  <t t-esc="doc.tracking_number"/>
+                </div>
+                <div style="font-size:12px; margin-top:2px;">
+                  Tracking Number
+                </div>
+              </div>
+            </t>
+
+            <table class="table table-sm" style="width:100%; margin-bottom: 15px;">
+              <tr>
+                <td style="width:50%; vertical-align: top;">
+                  <strong>Order Reference:</strong> <t t-esc="doc.name"/><br/>
+                  <strong>Request:</strong> <t t-esc="doc.request_id.name or ''"/><br/>
+                  <strong>Customer:</strong> <t t-esc="doc.partner_id.name or ''"/><br/>
+                  <strong>Source Hub:</strong> <t t-esc="doc.source_hub_id.name or ''"/><br/>
+                  <strong>Destination ZIP:</strong> <t t-esc="doc.dest_zip or ''"/><br/>
+                  <strong>City:</strong> <t t-esc="doc.city or ''"/><br/>
+                  <strong>State:</strong> <t t-esc="doc.state_name or ''"/>
+                </td>
+
+                <td style="width:50%; vertical-align: top;">
+                  <strong>Sender Name:</strong> <t t-esc="doc.sender_name or ''"/><br/>
+                  <strong>Sender Address:</strong><br/>
+                  <pre t-esc="doc.sender_address or ''" style="white-space: pre-wrap; margin: 0;"/>
+                  <hr/>
+                  <strong>Customer Name:</strong> <t t-esc="doc.customer_name or ''"/><br/>
+                  <strong>Customer Address:</strong><br/>
+                  <pre t-esc="doc.customer_address or ''" style="white-space: pre-wrap; margin: 0;"/>
+                </td>
+              </tr>
+            </table>
+
+            <h4>Amounts</h4>
+            <table class="table table-sm" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td><strong>Total Amount</strong></td>
+                <td style="text-align: right;"><t t-esc="doc.total_amount or 0.0"/></td>
+              </tr>
+            </table>
+
+            <div style="margin-top: 10px;">
+              <strong>Status:</strong> <t t-esc="doc.state"/>
+            </div>
+
+            <div style="margin-top:25px;">
+              <strong>Slip Ref:</strong>
+              <span t-field="doc.name" t-field-options="{'widget':'barcode','type':'code128'}"/>
+            </div>
+          </div>
+        </main>
+      </t>
+    </t>
+  </template>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<odoo>-->
+
+<!--  &lt;!&ndash; Report Action &ndash;&gt;-->
+<!--  <record id="action_report_request_order" model="ir.actions.report">-->
+<!--    <field name="name">Request Order PDF</field>-->
+<!--    <field name="model">codeware.request.order</field>-->
+<!--    <field name="report_type">qweb-pdf</field>-->
+<!--    <field name="report_name">codeware_management.report_request_order</field>-->
+<!--    <field name="report_file">codeware_management.report_request_order</field>-->
+<!--    <field name="binding_model_id" ref="model_codeware_request_order"/>-->
+<!--  </record>-->
+
+<!--  &lt;!&ndash; Report Template &ndash;&gt;-->
+<!--  <template id="report_request_order" t-name="codeware_management.report_request_order">-->
+<!--    <t t-call="web.external_layout">-->
+<!--      <t t-foreach="docs" t-as="doc">-->
+<!--        <main role="main" class="o_report_layout">-->
+<!--          <div class="page">-->
+<!--            <h2>Request Order - <t t-esc="doc.name"/></h2>-->
+
+<!--            <table class="table table-sm" style="width:100%; margin-bottom: 15px;">-->
+<!--              <tr>-->
+<!--                <td style="width:50%; vertical-align: top;">-->
+<!--                  <strong>Order Reference:</strong> <t t-esc="doc.name"/><br/>-->
+<!--                  <strong>Request:</strong> <t t-esc="doc.request_id.name or ''"/><br/>-->
+<!--                  <strong>Customer:</strong> <t t-esc="doc.partner_id.name or ''"/><br/>-->
+<!--                  <strong>Source Hub:</strong> <t t-esc="doc.source_hub_id.name or ''"/><br/>-->
+<!--                  <strong>Destination ZIP:</strong> <t t-esc="doc.dest_zip or ''"/><br/>-->
+<!--                  <strong>City:</strong> <t t-esc="doc.city or ''"/><br/>-->
+<!--                  <strong>State:</strong> <t t-esc="doc.state_name or ''"/>-->
+<!--                </td>-->
+
+<!--                <td style="width:50%; vertical-align: top;">-->
+<!--                  <strong>Sender Name:</strong> <t t-esc="doc.sender_name or ''"/><br/>-->
+<!--                  <strong>Sender Address:</strong><br/>-->
+<!--                  <pre t-esc="doc.sender_address or ''" style="white-space: pre-wrap; margin: 0;"/>-->
+<!--                  <hr/>-->
+<!--                  <strong>Customer Name:</strong> <t t-esc="doc.customer_name or ''"/><br/>-->
+<!--                  <strong>Customer Address:</strong><br/>-->
+<!--                  <pre t-esc="doc.customer_address or ''" style="white-space: pre-wrap; margin: 0;"/>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--            </table>-->
+
+<!--            <h4>Amounts</h4>-->
+<!--            <table class="table table-sm" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">-->
+<!--              <tr>-->
+<!--                <td><strong>Total Amount</strong></td>-->
+<!--                <td style="text-align: right;"><t t-esc="doc.total_amount or 0.0"/></td>-->
+<!--              </tr>-->
+<!--            </table>-->
+
+<!--            <div style="margin-top: 10px;">-->
+<!--              <strong>Status:</strong> <t t-esc="doc.state"/>-->
+<!--            </div>-->
+
+<!--            <div style="margin-top:25px;">-->
+<!--              <strong>Slip Ref:</strong>-->
+<!--              <span t-field="doc.name" t-field-options="{'widget':'barcode','type':'code128'}"/>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </main>-->
+<!--      </t>-->
+<!--    </t>-->
+<!--  </template>-->
+
+<!--</odoo>-->

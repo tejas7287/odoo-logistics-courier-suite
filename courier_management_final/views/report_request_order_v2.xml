@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Report Action (new PDF) -->
+    <record id="action_report_request_order_v2" model="ir.actions.report">
+        <field name="name">Request Order PDF (Clean)</field>
+        <field name="model">codeware.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">courier_management_final.report_request_order_v2</field>
+        <field name="report_file">courier_management_final.report_request_order_v2</field>
+        <field name="binding_model_id" ref="model_codeware_request"/>
+    </record>
+
+    <!-- QWeb template for the report (fixed for codeware.request) -->
+    <template id="report_request_order_v2" t-name="courier_management_final.report_request_order_v2">
+        <t t-call="web.external_layout">
+            <t t-foreach="docs" t-as="doc">
+                <main class="o_report_layout">
+                    <div class="page">
+                        <!-- Title -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <h2 style="margin:0 0 8px 0;">Request Order -
+                                <t t-esc="doc.name"/>
+                            </h2>
+                            <!-- Tracking + Barcode -->
+                            <t t-if="doc.barcode_image">
+                                <div style="margin:12px 0; text-align:left;">
+                                    <img t-att-src="'data:image/png;base64,%s' % doc.barcode_image.decode()"
+                                         style="width:300px; height:90px;"/>
+                                    <div style="margin-top:6px; font-size:20px; font-weight:700;">
+                                        <t t-esc="doc.tracking_number"/>
+                                    </div>
+                                    <div style="font-size:12px; margin-top:2px;">
+                                        Tracking Number
+                                    </div>
+                                </div>
+                            </t>
+
+
+                            <div style="text-align:right;">
+                                <strong>State:</strong>
+                                <div>
+                                    <t t-esc="doc.state or ''"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top two columns -->
+                        <table style="width:100%; margin-bottom: 12px;">
+                            <tr>
+                                <td style="width:50%; vertical-align:top; padding-right:12px;">
+                                    <div>
+                                        <strong>Request Reference:</strong>
+                                        <t t-esc="doc.name"/>
+                                    </div>
+                                    <!-- show any specific request identifier if you have one, else repeat name -->
+                                    <div>
+                                        <strong>Request:</strong>
+                                        <t t-esc="doc.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Customer:</strong>
+                                        <t t-esc="doc.partner_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Source Hub:</strong>
+                                        <t t-esc="doc.source_hub_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>ZIP Input:</strong>
+                                        <t t-esc="doc.zip_input or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Destination FinCode:</strong>
+                                        <t t-esc="doc.dest_fincode_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Destination ZIP:</strong>
+                                        <t t-esc="doc.dest_zip or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>City:</strong>
+                                        <t t-esc="doc.city or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>State:</strong>
+                                        <t t-esc="doc.state_name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Base Price:</strong>
+                                        <t t-esc="doc.base_price or 0.0"/>
+                                    </div>
+                                </td>
+
+                                <td style="width:50%; vertical-align:top; padding-left:12px;">
+                                    <div>
+                                        <strong>Sender Name:</strong>
+                                        <t t-esc="doc.sender_name or ''"/>
+                                    </div>
+                                    <div style="margin-top:6px;">
+                                        <strong>Sender Address:</strong>
+                                        <pre style="white-space: pre-wrap; margin:0; font-family: inherit;">
+                                            <t t-esc="doc.sender_address or ''"/>
+                                        </pre>
+                                    </div>
+
+                                    <div style="margin-top:10px;">
+                                        <strong>Customer Name:</strong>
+                                        <t t-esc="doc.customer_name or ''"/>
+                                    </div>
+                                    <div style="margin-top:6px;">
+                                        <strong>Customer Address:</strong>
+                                        <pre style="white-space: pre-wrap; margin:0; font-family: inherit;">
+                                            <t t-esc="doc.customer_address or ''"/>
+                                        </pre>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <hr style="border:none; border-top:1px solid #bbb; margin:12px 0;"/>
+
+                        <!-- Price lines table -->
+                        <h4 style="margin:8px 0;">Price Lines</h4>
+                        <table class="table table-sm"
+                               style="width:100%; border-collapse: collapse; margin-bottom:12px;">
+                            <thead>
+                                <tr style="background:#f5f5f5;">
+                                    <th style="text-align:left; padding:6px 8px; border:1px solid #e0e0e0;">
+                                        Description
+                                    </th>
+                                    <th style="text-align:right; padding:6px 8px; border:1px solid #e0e0e0;">Weight
+                                        (kg)
+                                    </th>
+                                    <th style="text-align:right; padding:6px 8px; border:1px solid #e0e0e0;">Distance
+                                        (km)
+                                    </th>
+                                    <th style="text-align:left; padding:6px 8px; border:1px solid #e0e0e0;">Priority
+                                    </th>
+                                    <th style="text-align:right; padding:6px 8px; border:1px solid #e0e0e0;">Unit
+                                        Price
+                                    </th>
+                                    <th style="text-align:right; padding:6px 8px; border:1px solid #e0e0e0;">Subtotal
+                                    </th>
+                                    <th style="text-align:center; padding:6px 8px; border:1px solid #e0e0e0;">COD</th>
+                                    <th style="text-align:right; padding:6px 8px; border:1px solid #e0e0e0;">COD
+                                        Amount
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="doc.line_ids">
+                                    <t t-foreach="doc.line_ids" t-as="line">
+                                        <tr>
+                                            <td style="padding:6px 8px; border:1px solid #eee;">
+                                                <t t-esc="line.product_desc or ''"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:right;">
+                                                <t t-esc="line.weight or 0.0"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:right;">
+                                                <t t-esc="line.distance_km or 0.0"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee;">
+                                                <t t-esc="line.priority or ''"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:right;">
+                                                <t t-esc="line.unit_price or 0.0"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:right;">
+                                                <t t-esc="line.price_subtotal or 0.0"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:center;">
+                                                <t t-esc="line.is_cod and '✓' or ''"/>
+                                            </td>
+                                            <td style="padding:6px 8px; border:1px solid #eee; text-align:right;">
+                                                <t t-esc="line.cod_amount or 0.0"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-if="not doc.line_ids">
+                                    <tr>
+                                        <td colspan="8"
+                                            style="padding:8px; border:1px solid #eee; text-align:center; color:#777;">
+                                            No price lines
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Totals and slip ref -->
+                        <div style="display:flex; justify-content:flex-end; gap:18px; margin-top:10px;">
+                            <div style="min-width:260px;">
+                                <table style="width:100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding:4px 8px; text-align:left; border-top:1px solid transparent;">
+                                            Total Amount
+                                        </td>
+                                        <td style="padding:4px 8px; text-align:right; border-top:1px solid transparent;">
+                                            <t t-esc="doc.amount_total or 0.0"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <strong>Slip Ref:</strong>
+                            <span>
+                                <t t-esc="doc.name"/>
+                            </span>
+                        </div>
+
+                    </div>
+                </main>
+            </t>
+        </t>
+    </template>
+</odoo>

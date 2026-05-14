@@ -1,0 +1,50 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
+
+    <defs>
+        <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3CCFCF"></stop>
+            <stop offset="100%" stop-color="#1C6B73"></stop>
+        </linearGradient>
+        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6EA8FE"></stop>
+            <stop offset="100%" stop-color="#2E6BE6"></stop>
+        </linearGradient>
+        <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFC46B"></stop>
+            <stop offset="100%" stop-color="#F39C12"></stop>
+        </linearGradient>
+        <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6EE7B7"></stop>
+            <stop offset="100%" stop-color="#16A34A"></stop>
+        </linearGradient>
+    </defs>
+
+    <!-- Clipboard -->
+    <rect x="48" y="120" width="160" height="232" rx="22" fill="#ECF9F9" stroke="url(#tealGrad)" stroke-width="20"></rect>
+
+    <path d="M92 120 h72 a18 18 0 0 0 18 -18
+             a24 24 0 0 0 -96 0
+             a18 18 0 0 0 18 18 z" fill="url(#blueGrad)"></path>
+
+    <line x1="72" y1="184" x2="184" y2="184" stroke="#2E6BE6" stroke-width="14" stroke-linecap="round"></line>
+    <line x1="72" y1="228" x2="184" y2="228" stroke="#2E6BE6" stroke-width="14" stroke-linecap="round"></line>
+    <line x1="72" y1="272" x2="160" y2="272" stroke="#2E6BE6" stroke-width="14" stroke-linecap="round"></line>
+
+    <!-- Warehouse -->
+    <path d="M232 168 L384 96 L464 168" fill="none" stroke="url(#tealGrad)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"></path>
+
+    <line x1="464" y1="168" x2="464" y2="328" stroke="url(#tealGrad)" stroke-width="20" stroke-linecap="round"></line>
+
+    <!-- Boxes -->
+    <rect x="256" y="216" width="88" height="72" rx="12" fill="#FFF5E6" stroke="url(#orangeGrad)" stroke-width="16"></rect>
+    <rect x="208" y="280" width="88" height="72" rx="12" fill="#FFF5E6" stroke="url(#orangeGrad)" stroke-width="16"></rect>
+    <rect x="304" y="280" width="88" height="72" rx="12" fill="#FFF5E6" stroke="url(#orangeGrad)" stroke-width="16"></rect>
+
+    <!-- Flow Arrow -->
+    <path d="M120 344
+             C208 424, 336 424, 400 352" fill="none" stroke="url(#greenGrad)" stroke-width="26" stroke-linecap="round"></path>
+
+    <polygon points="400,320 456,352 400,384" fill="url(#greenGrad)"></polygon>
+
+</svg>

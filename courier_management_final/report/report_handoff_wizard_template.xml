@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_handoff_wizard" t-name="courier_management_final.report_handoff_wizard">
+        <t t-call="web.external_layout">
+            <t t-foreach="docs" t-as="doc">
+                <main class="o_report_layout">
+                    <div class="page">
+
+                        <!-- TITLE -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <h2 style="margin:0 0 8px 0;">
+                                Handoff Order
+<!--                                <t t-esc="doc.name"/>-->
+                            </h2>
+
+                            <!--                            <div style="text-align:right;">-->
+                            <!--                                <strong>Status:</strong>-->
+                            <!--                                <div>-->
+                            <!--                                    <t t-esc="doc.state or ''"/>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
+                        </div>
+
+                        <!-- TWO COLUMNS LIKE REQUEST PDF -->
+                        <table style="width:100%; margin-bottom: 12px;">
+                            <tr>
+                                <td style="width:50%; vertical-align:top; padding-right:12px;">
+                                    <div>
+                                        <strong>Driver:</strong>
+                                        <t t-esc="doc.driver_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Vehicle:</strong>
+                                        <t t-esc="doc.vehicle_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Vehicle Number:</strong>
+                                        <t t-esc="doc.vehicle_number or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Courier Partner:</strong>
+                                        <t t-esc="doc.courier_partner_id.name or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Manifest Ref:</strong>
+                                        <t t-esc="doc.manifest_ref or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Parcel Count:</strong>
+                                        <t t-esc="doc.parcel_count or 0"/>
+                                    </div>
+                                </td>
+
+                                <td style="width:50%; vertical-align:top; padding-left:12px;">
+                                    <div>
+                                        <strong>Assigned On:</strong>
+                                        <t t-esc="doc.assigned_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Picked On:</strong>
+                                        <t t-esc="doc.picked_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Delivered On:</strong>
+                                        <t t-esc="doc.delivered_datetime or ''"/>
+                                    </div>
+                                    <div>
+                                        <strong>Status:</strong>
+                                        <t t-esc="doc.state or ''"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <hr style="border:none; border-top:1px solid #bbb; margin:12px 0;"/>
+
+                        <!-- PICKINGS TABLE -->
+                        <h4 style="margin:8px 0;">Pickings</h4>
+
+                        <table class="table table-sm"
+                               style="width:100%; border-collapse: collapse; margin-bottom:12px;">
+                            <thead>
+                                <tr style="background:#f5f5f5;">
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Picking</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Sale Order</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Delivery Address</th>
+                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">ZipCode</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <t t-foreach="doc.picking_id" t-as="pi">
+                                    <tr>
+
+                                        <!-- PICKING -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.name"/>
+                                        </td>
+
+                                        <!-- SALE ORDER -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.sale_id.name if pi.sale_id else ''"/>
+                                        </td>
+                                        <td style="padding:6px 8px; border:1px solid #eee; line-height:14px;">
+                                            <strong>
+                                                <t t-esc="pi.receiver_name or ''"/>
+                                            </strong>
+                                            <br/>
+                                            <t t-esc="pi.receiver_address or ''"/>
+                                            <br/>
+                                            Phone:
+                                            <t t-esc="pi.receiver_phone or ''"/>
+                                            <br/>
+                                            ZIP:
+                                            <t t-esc="pi.receiver_zip or ''"/>
+                                        </td>
+
+                                        <!-- ZIP CODE SEPARATE COLUMN -->
+                                        <td style="padding:6px 8px; border:1px solid #eee;">
+                                            <t t-esc="pi.receiver_zip or ''"/>
+                                        </td>
+
+
+                                        <!--                                        &lt;!&ndash; DELIVERY ADDRESS PER PICKING &ndash;&gt;-->
+                                        <!--                                        <td style="padding:6px 8px; border:1px solid #eee; line-height:14px;">-->
+                                        <!--                                            <t t-if="pi.partner_id">-->
+                                        <!--                                                <strong><t t-esc="pi.partner_id.name"/></strong><br/>-->
+                                        <!--                                                <t t-esc="pi.partner_id.street or ''"/><br/>-->
+                                        <!--                                                <t t-esc="pi.partner_id.city or ''"/> - -->
+                                        <!--                                                <t t-esc="pi.partner_id.zip or ''"/><br/>-->
+                                        <!--                                                <t t-esc="pi.partner_id.state_id.name or ''"/><br/>-->
+                                        <!--                                                <t t-esc="pi.partner_id.country_id.name or ''"/>-->
+                                        <!--                                            </t>-->
+                                        <!--                                        </td>-->
+
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- NOTES -->
+                        <div style="margin-top:20px;">
+                            <strong>Notes:</strong>
+                            <pre style="white-space: pre-wrap; margin:0;">
+                                <t t-esc="doc.notes or ''"/>
+                            </pre>
+                        </div>
+                        <footer>
+                             <div style="margin-top:20px;">
+                            <strong>Driver Signature:</strong>
+
+                        </div>
+                        </footer>
+
+                    </div>
+                </main>
+            </t>
+        </t>
+    </template>
+</odoo>
+
+
+        <!--<odoo>-->
+        <!--    <template id="report_handoff_wizard" t-name="courier_management_final.report_handoff_wizard">-->
+        <!--        <t t-call="web.external_layout">-->
+        <!--            <t t-foreach="docs" t-as="doc">-->
+        <!--                <main class="o_report_layout">-->
+        <!--                    <div class="page">-->
+
+        <!--                        &lt;!&ndash; TITLE &ndash;&gt;-->
+        <!--                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">-->
+        <!--                            <h2 style="margin:0 0 8px 0;">-->
+        <!--                                Handoff Reference - -->
+        <!--                                <t t-esc="doc.name"/>-->
+        <!--                            </h2>-->
+
+        <!--                            <div style="text-align:right;">-->
+        <!--                                <strong>Status:</strong>-->
+        <!--                                <div>-->
+        <!--                                    <t t-esc="doc.state or ''"/>-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+
+        <!--                        &lt;!&ndash; TWO COLUMNS LIKE REQUEST PDF &ndash;&gt;-->
+        <!--                        <table style="width:100%; margin-bottom: 12px;">-->
+        <!--                            <tr>-->
+        <!--                                <td style="width:50%; vertical-align:top; padding-right:12px;">-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Driver:</strong>-->
+        <!--                                        <t t-esc="doc.driver_id.name or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Vehicle:</strong>-->
+        <!--                                        <t t-esc="doc.vehicle_id.name or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Vehicle Number:</strong>-->
+        <!--                                        <t t-esc="doc.vehicle_number or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Courier Partner:</strong>-->
+        <!--                                        <t t-esc="doc.courier_partner_id.name or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Manifest Ref:</strong>-->
+        <!--                                        <t t-esc="doc.manifest_ref or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Parcel Count:</strong>-->
+        <!--                                        <t t-esc="doc.parcel_count or 0"/>-->
+        <!--                                    </div>-->
+        <!--                                </td>-->
+
+        <!--                                <td style="width:50%; vertical-align:top; padding-left:12px;">-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Assigned On:</strong>-->
+        <!--                                        <t t-esc="doc.assigned_datetime or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Picked On:</strong>-->
+        <!--                                        <t t-esc="doc.picked_datetime or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div>-->
+        <!--                                        <strong>Delivered On:</strong>-->
+        <!--                                        <t t-esc="doc.delivered_datetime or ''"/>-->
+        <!--                                    </div>-->
+        <!--                                </td>-->
+        <!--                            </tr>-->
+        <!--                        </table>-->
+
+        <!--                        <hr style="border:none; border-top:1px solid #bbb; margin:12px 0;"/>-->
+
+        <!--                        &lt;!&ndash; PICKINGS TABLE &ndash;&gt;-->
+        <!--                        <h4 style="margin:8px 0;">Pickings</h4>-->
+
+        <!--                        <table class="table table-sm"-->
+        <!--                               style="width:100%; border-collapse: collapse; margin-bottom:12px;">-->
+        <!--                            <thead>-->
+        <!--                                <tr style="background:#f5f5f5;">-->
+        <!--                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Picking</th>-->
+        <!--                                    <th style="padding:6px 8px; border:1px solid #e0e0e0;">Sale Order</th>-->
+        <!--                                </tr>-->
+        <!--                            </thead>-->
+        <!--                            <tbody>-->
+        <!--                                <t t-foreach="doc.picking_id" t-as="pi">-->
+        <!--                                    <tr>-->
+        <!--                                        <td style="padding:6px 8px; border:1px solid #eee;">-->
+        <!--                                            <t t-esc="pi.name"/>-->
+        <!--                                        </td>-->
+        <!--                                        <td style="padding:6px 8px; border:1px solid #eee;">-->
+        <!--                                            <t t-esc="pi.sale_id.name if pi.sale_id else ''"/>-->
+        <!--                                        </td>-->
+        <!--                                    </tr>-->
+        <!--                                </t>-->
+        <!--                            </tbody>-->
+        <!--                        </table>-->
+
+        <!--                        &lt;!&ndash; NOTES &ndash;&gt;-->
+        <!--                        <div style="margin-top:20px;">-->
+        <!--                            <strong>Notes:</strong>-->
+        <!--                            <pre style="white-space: pre-wrap; margin:0;">-->
+        <!--                                <t t-esc="doc.notes or ''"/>-->
+        <!--                            </pre>-->
+        <!--                        </div>-->
+
+        <!--                    </div>-->
+        <!--                </main>-->
+        <!--            </t>-->
+        <!--        </t>-->
+        <!--    </template>-->
+        <!--</odoo>-->

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_picking_form_inherit_receiver" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.receiver</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add receiver details right under Delivery Address -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <group string="Consignee Details">
+                    <field name="receiver_name"/>
+                    <field name="receiver_phone"/>
+                    <field name="receiver_address"/>
+                    <field name="receiver_zip"/>
+                    <field name="picking_serviced_by_id"/>
+                    <field name="priority_type"/>
+                    <field name="delivery_description"/>
+                    <field name="awb_number"/>
+                    <field name="barcode_number"/>
+                    <field name="handoff_ref"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <!-- THIS NEW RECORD ADDS THE CONFIRMATION ALERT -->
+    <record id="view_picking_form_inherit_validate_alert" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.validate.alert</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Target the standard 'button_validate' by its name attribute -->
+            <xpath expr="//button[@name='button_validate']" position="attributes">
+                <!-- Add the 'confirm' attribute with your alert message -->
+                <attribute name="confirm">Attention: Validation is irreversible. Once confirmed, products will be moved
+                    to the selected location and the Handoff process for this delivery will be locked.
+                </attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+
+    <record id="view_picking_internal_search_inherit_zip_combined"
+            model="ir.ui.view">
+        <field name="name">stock.picking.internal.search.inherit.zip.combined</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//search/field[@name='name']" position="attributes">
+                <attribute name="string">Transfer / Reference / ZIP / City / Address</attribute>
+                <attribute name="filter_domain">
+                    [
+                    '|','|','|','|','|',
+                    ('name', 'ilike', self),
+                    ('origin', 'ilike', self),
+                    ('receiver_zip', 'ilike', self),
+                    ('partner_id.zip', 'ilike', self),
+                    ('partner_id.city', 'ilike', self),
+                    ('receiver_address', 'ilike', self)
+                    ]
+                </attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add a small checkbox into the partner form to mark a contact as transit hub -->
+    <record id="view_partner_form_inherit_transit_hub" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.transit.hub</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/> <!-- base partner form -->
+        <field name="arch" type="xml">
+            <!-- insert into the 'Sales' group; the snippet you provided contains group name="sale" -->
+            <xpath expr="//group[@name='sale']" position="inside">
+                <group>
+                    <field name="is_transit_hub" widget="boolean_button"/>
+                     <field name="portal_location_id"
+                           domain="[('usage','=','internal')]"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

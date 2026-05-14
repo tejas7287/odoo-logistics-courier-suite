@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Security group for Vendor Portal -->
+    <record id="group_vendor_portal_user" model="res.groups">
+        <field name="name">Vendor Portal User</field>
+        <field name="comment">Portal users who can fill vendor dispatch details.</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <!-- Record rule: Vendors can only access their own pickings -->
+    <record id="rule_vendor_own_pickings" model="ir.rule">
+        <field name="name">Vendor can see own pickings</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('vendor_dispatch_portal_v2.group_vendor_portal_user'))]"/>
+        <field name="domain_force">[('partner_id.user_ids', 'in', [user.id])]</field>
+    </record>
+
+    <!-- Record rule: Admin has full access -->
+    <record id="rule_admin_all_pickings" model="ir.rule">
+        <field name="name">Admin can see all pickings</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+</odoo>

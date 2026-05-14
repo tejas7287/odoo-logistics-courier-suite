@@ -1,0 +1,20 @@
+<odoo>
+    <record id="product_template_form_dropship_checkbox_top" model="ir.ui.view">
+        <field name="name">product.template.form.dropship.checkbox.top</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Dropship checkbox next to Sales -->
+            <xpath expr="//div[@name='options']" position="inside">
+
+                <span name="dropship_option" class="d-inline-flex ms-3">
+                    <field name="enable_dropship" string="Dropship"/>
+                    <label for="enable_dropship"/>
+                </span>
+
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
